@@ -1,0 +1,11 @@
+# Ignore directories
+node_modules/
+dist/
+
+# Ignore specific files
+*.log
+*.tmp
+
+# Ignore files in specific directories
+src/generated/
+public/
