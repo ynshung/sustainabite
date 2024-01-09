@@ -9,7 +9,7 @@ function Map() {
       <MapContainer
         center={[5.354669283327304, 100.3015388795525]}
         zoom={16}
-        className="h-[800px] w-[1024px] mx-auto"
+        className="h-screen mx-auto"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
