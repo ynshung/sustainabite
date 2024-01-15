@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -9,7 +10,7 @@ export default {
       },
       colors: {
         // 200
-        bone: {
+        theme1: {
           50: "#faf6f2",
           100: "#f2ece2",
           200: "#ebe0d1",
@@ -23,7 +24,7 @@ export default {
           950: "#311f19",
         },
         // 400
-        buff: {
+        theme2: {
           50: "#fbf7f1",
           100: "#f5ecdf",
           200: "#ead7be",
@@ -37,7 +38,7 @@ export default {
           950: "#341c16",
         },
         // 900
-        taupe: {
+        theme3: {
           50: "#f6f5f0",
           100: "#e8e5d9",
           200: "#d2cdb6",
@@ -59,7 +60,7 @@ export default {
       {
         light: {
           ...require("daisyui/src/theming/themes")["light"],
-          primary: "#b5835a",
+          primary: "#94845e",
           secondary: "#4a3d34",
           accent: "#fcd34d",
         },
