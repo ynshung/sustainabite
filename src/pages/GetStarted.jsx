@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { auth, db, storage } from "../firebase";
-import { useNavigate } from "react-router-dom";
-import { doc, setDoc } from "firebase/firestore";
+import { auth } from "../firebase";
+import { Link, useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import UserProfile from "../components/profile/UserProfile";
 import OrgProfile from "../components/profile/OrgProfile";
 import { toast } from "react-toastify";
 import _ from "underscore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { FaAngleLeft } from "react-icons/fa6";
+import { uploadProfileFiles, uploadFirestore } from "../utils/firebase-upload";
 
 const GetStarted = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [accountType, setAccountType] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState("");
 
@@ -29,7 +31,7 @@ const GetStarted = () => {
     });
 
     unsubscribe();
-  }, [navigate, user]);
+  }, [navigate]);
 
   useEffect(() => {
     if (formData && !_.isEmpty(formData) && user.uid) {
@@ -38,82 +40,24 @@ const GetStarted = () => {
         email: user.email,
         accountType: accountType,
       };
-      console.log(obj);
+
+      uploadProfileFiles(obj, user.uid)
+        .then((res) => {
+          uploadFirestore(res, user.uid, accountType)
+            .then(() => {
+              setLoading(false);
+              toast.success("Profile submitted!");
+              navigate("/dashboard");
+            })
+            .catch((err) => {
+              toast.error(err.message);
+            });
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
 
       // If obj contains proofOfOwnership File, upload to Firebase Storage and replace with downloadURL
-      if (obj.proofOfOwnership) {
-        obj.proofOfOwnership = obj.proofOfOwnership[0];
-        const storageRef = ref(
-          storage,
-          `proofOfOwnership/${user.uid}/${obj.proofOfOwnership.name}`,
-        );
-        uploadBytes(storageRef, obj.proofOfOwnership)
-          .then((snapshot) => {
-            console.log("Uploaded a blob or file!");
-            getDownloadURL(snapshot.ref).then((url) => {
-              console.log(url);
-              obj.proofOfOwnership = url;
-
-              let docName;
-
-              let firebaseObj = JSON.parse(JSON.stringify(obj));
-              delete firebaseObj.proofOfOwnership;
-
-              setDoc(doc(db, accountType, user.uid), firebaseObj)
-                .then(() => {
-                  setDoc(doc(db, "accountTypes", user.uid), {
-                    accountType: accountType,
-                  })
-                    .then(() => {
-                      navigate("/dashboard");
-                    })
-                    .catch((error) => {
-                      toast.error(error.message);
-                      console.error(
-                        "Error writing document " + accountType + ": ",
-                        error,
-                      );
-                    });
-                })
-                .catch((error) => {
-                  toast.error(error.message);
-                  console.error(
-                    "Error writing document " + docName + ": ",
-                    error,
-                  );
-                });
-            });
-          })
-          .catch((error) => {
-            toast.error(error.message);
-            console.log(error);
-          });
-      } else {
-        let firebaseObj = JSON.parse(JSON.stringify(obj));
-        delete firebaseObj.proofOfOwnership;
-
-        setDoc(doc(db, accountType, user.uid), firebaseObj)
-          .then(() => {
-            setDoc(doc(db, "accountType", user.uid), {
-              accountType: accountType,
-            })
-              .then(() => {
-                toast.success("Account created successfully!");
-                navigate("/dashboard");
-              })
-              .catch((error) => {
-                toast.error(error.message);
-                console.error("Error writing document accountType: ", error);
-              });
-          })
-          .catch((error) => {
-            toast.error(error.message);
-            console.error(
-              "Error writing document " + accountType + ": ",
-              error,
-            );
-          });
-      }
     }
   }, [formData, user, navigate, accountType]);
 
@@ -191,27 +135,64 @@ const GetStarted = () => {
       ) : currentStep === 2 ? (
         accountType === "users" ? (
           <>
-            <h1 className="font-bold text-xl">Individual Registration</h1>
-            <p className="text-neutral-600">
-              Complete your profile info below.
-            </p>
-            <UserProfile email={user.email} onChildData={setFormData} />
+            <div className="flex flex-row gap-3 items-center">
+              <Link to="/get-started" reloadDocument>
+                <FaAngleLeft size={24} />
+              </Link>
+              <div>
+                <h1 className="font-bold text-xl">Individual Registration</h1>
+                <p className="text-neutral-600">
+                  Complete your profile info below.
+                </p>
+              </div>
+            </div>
+            <UserProfile
+              email={user.email}
+              onChildData={setFormData}
+              loading={loading}
+              setLoading={setLoading}
+            />
           </>
         ) : accountType === "vendors" ? (
           <>
-            <h1 className="font-bold text-xl">Vendor Registration</h1>
-            <p className="text-neutral-600">
-              Complete your profile info below.
-            </p>
-            <OrgProfile email={user.email} onChildData={setFormData} />
+            <div className="flex flex-row gap-3 items-center">
+              <Link to="/get-started" reloadDocument>
+                <FaAngleLeft size={24} />
+              </Link>
+              <div>
+                <h1 className="font-bold text-xl">Vendor Registration</h1>
+                <p className="text-neutral-600">
+                  Complete your profile info below.
+                </p>
+              </div>
+            </div>
+            <OrgProfile
+              email={user.email}
+              onChildData={setFormData}
+              loading={loading}
+              setLoading={setLoading}
+            />
           </>
         ) : accountType === "charities" ? (
           <>
-            <h1 className="font-bold text-xl">Organization Registration</h1>
-            <p className="text-neutral-600">
-              Complete your profile info below.
-            </p>
-            <OrgProfile email={user.email} charity onChildData={setFormData} />
+            <div className="flex flex-row gap-3 items-center">
+              <Link to="/get-started" reloadDocument>
+                <FaAngleLeft size={24} />
+              </Link>
+              <div>
+                <h1 className="font-bold text-xl">Organization Registration</h1>
+                <p className="text-neutral-600">
+                  Complete your profile info below.
+                </p>
+              </div>
+            </div>
+            <OrgProfile
+              email={user.email}
+              charity
+              onChildData={setFormData}
+              loading={loading}
+              setLoading={setLoading}
+            />
           </>
         ) : (
           <>You shouldn&#39;t be here! Reload the page and try again.</>

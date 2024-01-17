@@ -1,15 +1,20 @@
 import { useForm } from "react-hook-form";
 import PropTypes from "prop-types";
-import { useState } from "react";
 
-function UserProfile({ email, onChildData }) {
-  const { register, handleSubmit } = useForm();
+function UserProfile({
+  email,
+  defaultObj = {},
+  loading = false,
+  setLoading,
+  onChildData,
+}) {
+  const { register, handleSubmit } = useForm({
+    defaultValues: defaultObj,
+  });
   const onSubmit = (d) => {
     setLoading(true);
     onChildData(d);
   };
-  const [loading, setLoading] = useState(false);
-
   return (
     <>
       <form className="form-control" onSubmit={handleSubmit(onSubmit)}>
@@ -26,13 +31,24 @@ function UserProfile({ email, onChildData }) {
         </div>
         <div className="my-3">
           <label className="label">
-            <span className="label-text">Full Name</span>
+            <span className="label-text">First Name</span>
           </label>
           <input
             type="text"
             className="input input-bordered w-full"
             required
-            {...register("fullName")}
+            {...register("firstName")}
+          />
+        </div>
+        <div className="my-3">
+          <label className="label">
+            <span className="label-text">Last Name</span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered w-full"
+            required
+            {...register("lastName")}
           />
         </div>
         <div className="my-3">
@@ -65,6 +81,9 @@ function UserProfile({ email, onChildData }) {
 UserProfile.propTypes = {
   email: PropTypes.string,
   onChildData: PropTypes.func,
+  defaultObj: PropTypes.object,
+  loading: PropTypes.bool,
+  setLoading: PropTypes.func,
 };
 
 export default UserProfile;

@@ -15,7 +15,7 @@ function SignUp() {
 
   console.log(window.location.origin);
   let actionCodeSettings = {
-    url: window.location.origin + "/login",
+    url: window.location.origin + "/get-started",
   };
 
   const signUp = (e) => {
@@ -37,6 +37,7 @@ function SignUp() {
             toast.success(
               "Email verification sent! Check your inbox or spam folder.",
             );
+            setLoading(false);
           })
           .catch((error) => {
             const errorCode = error.code;
@@ -47,6 +48,7 @@ function SignUp() {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        setLoading(false);
 
         switch (errorCode) {
           case "auth/invalid-email":
@@ -62,9 +64,6 @@ function SignUp() {
             toast.error(errorMessage);
             break;
         }
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
 

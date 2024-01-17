@@ -14,6 +14,7 @@ import CenterElement from "./components/CenterElement";
 import GetStarted from "./pages/GetStarted";
 import { ToastContainer } from "react-toastify";
 import Dashboard from "./pages/dashboard/Dashboard";
+import EditProfile from "./pages/dashboard/EditProfile";
 
 export function App() {
   return (
@@ -33,7 +34,12 @@ export function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
 
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard">
+              <Route index element={<Dashboard />} />
+              <Route element={<CenterElement />}>
+                <Route path="edit-profile" element={<EditProfile />} />
+              </Route>
+            </Route>
 
             <Route path="/admin/dashboard" />
           </Routes>

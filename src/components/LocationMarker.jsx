@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { Marker, Popup, useMap } from "react-leaflet";
 import PropTypes from "prop-types";
 
-const LocationMarker = ({ position, setPosition }) => {
+const LocationMarker = ({ position, setPosition, locate }) => {
   const markerRef = useRef(null);
   const eventHandlers = useMemo(
     () => ({
@@ -18,11 +18,15 @@ const LocationMarker = ({ position, setPosition }) => {
   const map = useMap();
 
   useEffect(() => {
-    map.locate().on("locationfound", function (e) {
-      setPosition(e.latlng);
-      map.setView(e.latlng, map.getZoom());
-    });
-  }, [map, setPosition]);
+    if (locate) {
+      map.locate().on("locationfound", function (e) {
+        setPosition(e.latlng);
+        map.setView(e.latlng, map.getZoom());
+      });
+    } else {
+      map.setView(position, map.getZoom());
+    }
+  }, [locate, map, position, setPosition]);
 
   return position === null ? null : (
     <Marker
@@ -42,6 +46,7 @@ LocationMarker.propTypes = {
     lng: PropTypes.number,
   }),
   setPosition: PropTypes.func,
+  locate: PropTypes.bool,
 };
 
 export default LocationMarker;
