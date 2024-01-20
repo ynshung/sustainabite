@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import { FaCircleInfo, FaList, FaPencil } from "react-icons/fa6";
+import { FaChevronLeft, FaCircleInfo, FaList, FaPencil } from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
-import VendorListing from "../../components/list/VendorListing";
+import VendorItemsList from "../../components/list/VendorItemsList";
+import VendorList from "../../components/list/VendorList";
+import { getVendors } from "../../utils/get-vendors";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const Dashboard = () => {
   let [accountType, setAccountType] = useState("");
   const navigate = useNavigate();
 
-  let [selectedVendor, setSelectedVendor] = useState(null);
+  let [selectedVendorID, setSelectedVendorID] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -52,6 +54,16 @@ const Dashboard = () => {
     unsubscribe();
   }, [navigate, accountType]);
 
+  const [vendors, setVendors] = useState({});
+
+  useEffect(() => {
+    const unsubscribe = getVendors(vendors, setVendors);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [vendors]);
+
   return (
     <>
       {!loading && (
@@ -74,14 +86,44 @@ const Dashboard = () => {
       )}
       {loading ? (
         <progress className="progress w-56 mx-auto progress-primary my-24" />
-      ) : user && accountType === "users" ? (
+      ) : user && (accountType === "users" || accountType === "charities") ? (
         <>
           <MapList
             viewListing={(id) => {
-              setSelectedVendor(id);
+              setSelectedVendorID(id);
             }}
+            selectedVendorID={selectedVendorID}
+            vendors={vendors}
           />
-          <VendorListing vendor={selectedVendor} />
+          {selectedVendorID ? (
+            <div className="m-8">
+              <div
+                className="flex flex-row items-center gap-2 cursor-pointer"
+                onClick={() => setSelectedVendorID(null)}
+              >
+                <FaChevronLeft className="inline" size={18} /> Go back to Vendor
+                List
+              </div>
+              <hr className="my-4" />
+              <h2 className="font-bold text-3xl">
+                {vendors[selectedVendorID].orgName}
+              </h2>
+              <p className="mt-1 mb-4">
+                Total listing: {vendors[selectedVendorID].activeItems}
+              </p>
+              <VendorItemsList vendor={selectedVendorID} />
+            </div>
+          ) : (
+            <div className="mx-8 my-6">
+              <h2 className="text-xl font-bold mb-2">Vendors Near You</h2>
+              <VendorList
+                vendors={vendors}
+                viewListing={(id) => {
+                  setSelectedVendorID(id);
+                }}
+              />
+            </div>
+          )}
           <div className="m-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
               <li>
@@ -93,7 +135,7 @@ const Dashboard = () => {
               <li>
                 <Link to="404" className="flex items-center gap-3">
                   <FaList />
-                  See Listings
+                  Do Something
                 </Link>
               </li>
               <li>
@@ -138,8 +180,6 @@ const Dashboard = () => {
             </div>
           )}
         </>
-      ) : accountType === "charities" ? (
-        <>Charities</>
       ) : (
         <>
           You shouldn&#39;t be here! Please reload the page or relogin/register.

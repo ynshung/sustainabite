@@ -1,26 +1,29 @@
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
+import _ from "underscore";
 
-export const getVendorListing = (setListing, vendorID, unsubscribe) => {
+export const getVendorListing = (vendorListing, setListing, vendorID) => {
   const q = query(
     collection(db, "listing"),
     where("vendor", "==", vendorID),
     where("active", "==", true),
+    where("qty", ">", 0),
   );
-  unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const listing = {};
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const newVendorListing = _.clone(vendorListing);
     querySnapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
-        listing[change.doc.id] = change.doc.data();
+        newVendorListing[change.doc.id] = change.doc.data();
       }
       if (change.type === "modified") {
-        listing[change.doc.id] = change.doc.data();
+        newVendorListing[change.doc.id] = change.doc.data();
       }
       if (change.type === "removed") {
-        delete listing[change.doc.id];
+        delete newVendorListing[change.doc.id];
       }
     });
-    setListing(listing);
+    if (!_.isEqual(newVendorListing, vendorListing))
+      setListing(newVendorListing);
   });
   return unsubscribe;
 };

@@ -21,7 +21,7 @@ export function App() {
     <ErrorBoundary FallbackComponent={fallbackComponent}>
       <BrowserRouter>
         <ToastContainer />
-        <div className="min-h-screen flex flex-col bg-white">
+        <div className="min-h-screen flex flex-col bg-white shadow">
           <NavBar />
           <Routes>
             <Route path="/" element={<Home />} />

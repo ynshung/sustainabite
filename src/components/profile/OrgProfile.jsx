@@ -161,7 +161,12 @@ function OrgProfile({
             <label className="label">
               <span className="label-text">Location</span>
             </label>
-            <MapDraggable position={position} setPosition={setPosition} locate={!editProfile} />
+            <MapDraggable
+              position={position}
+              setPosition={setPosition}
+              locate={!editProfile}
+              initalSetCurrLoc={!editProfile}
+            />
             <div className="label">
               <span className="label-text-alt">
                 Drag marker to your vendor&apos;s location

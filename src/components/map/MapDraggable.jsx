@@ -17,7 +17,6 @@ function MapDraggable({ position = null, setPosition, locate = true }) {
         <CurrentLocation
           position={position}
           jumpToCurrLoc={locate}
-          showPosition={!locate}
           setPosition={setPosition}
         />
         <LocationMarker position={position} setPosition={setPosition} />

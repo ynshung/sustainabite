@@ -1,33 +1,30 @@
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
-import { getVendors } from "../../utils/get-vendors";
-import { blueIcon, greyIcon } from "./MarkerIcons";
+import { useRef } from "react";
+import { blueIcon, greyIcon, redIcon } from "./MarkerIcons";
 import CurrentLocation from "./CurrentLocation";
 
-const MapList = ({ children, viewListing }) => {
+const MapList = ({ viewListing, selectedVendorID, vendors }) => {
   const accessToken = import.meta.env.VITE_MAPBOX_ACCESSTOKEN;
 
-  const [vendors, setVendors] = useState({});
-
   const popupElement = useRef(null);
-
-  useEffect(() => {
-    getVendors(setVendors, null);
-  }, []);
 
   const selectVendor = (vendorID) => {
     viewListing(vendorID);
     popupElement.current._closeButton.click();
-  }
+  };
 
   const LocationMarker = ({ vendorID, vendorData }) => {
     return (
       <Marker
         position={[vendorData.latitude, vendorData.longitude]}
         icon={
-          vendors.activeItems && vendors.activeItems > 0 ? blueIcon : greyIcon
+          selectedVendorID === vendorID
+            ? redIcon
+            : vendorData.activeItems && vendorData.activeItems > 0
+              ? blueIcon
+              : greyIcon
         }
       >
         <Popup ref={popupElement}>
@@ -37,19 +34,20 @@ const MapList = ({ children, viewListing }) => {
               <p className="font-bold">{vendorData.orgName}</p>
             </div>
             {vendorData.activeItems && vendorData.activeItems ? (
-              <>
-                <span>Current Listing: {vendorData.activeItems}</span>
-                <br />
-                <span>
-                  Click{" "}
-                  <a onClick={() => selectVendor(vendorID)} className="link">
-                    here
-                  </a>{" "}
-                  to view listing
-                </span>
-              </>
+              <div className="mx-auto text-center">
+                <div>
+                  {vendorData.activeItems} active listing
+                  {vendorData.activeItems > 1 && "s"}
+                </div>
+                <button
+                  className="btn btn-primary btn-sm text-white mx-auto text-center mt-2"
+                  onClick={() => selectVendor(vendorID)}
+                >
+                  View Listing
+                </button>
+              </div>
             ) : (
-              <span>No active listing</span>
+              <div className="text-center">No active listing</div>
             )}
           </div>
         </Popup>
@@ -65,16 +63,14 @@ const MapList = ({ children, viewListing }) => {
   return (
     <>
       <MapContainer
-        center={[5.354669283327304, 100.3015388795525]}
+        center={[5.356205, 100.296206]}
         zoom={16}
         className="h-96 w-full mx-auto"
       >
         <CurrentLocation
           showPosition={true}
           jumpToCurrLoc={false} // TODO: change this to true for demo
-          position={{ lat: 5.354669283327304, lng: 100.3015388795525 }}
         />
-        {children}
         {Object.keys(vendors).map((id) => (
           <LocationMarker key={id} vendorID={id} vendorData={vendors[id]} />
         ))}
@@ -91,6 +87,8 @@ const MapList = ({ children, viewListing }) => {
 MapList.propTypes = {
   children: PropTypes.node,
   viewListing: PropTypes.func,
+  selectedVendorID: PropTypes.string,
+  vendors: PropTypes.object,
 };
 
 export default MapList;
