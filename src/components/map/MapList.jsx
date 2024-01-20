@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getVendors } from "../../utils/get-vendors";
 import { blueIcon, greyIcon } from "./MarkerIcons";
 import CurrentLocation from "./CurrentLocation";
@@ -11,31 +11,42 @@ const MapList = ({ children, viewListing }) => {
 
   const [vendors, setVendors] = useState({});
 
+  const popupElement = useRef(null);
+
   useEffect(() => {
     getVendors(setVendors, null);
   }, []);
 
-  const LocationMarker = (id) => {
-    id = id.id;
+  const selectVendor = (vendorID) => {
+    viewListing(vendorID);
+    popupElement.current._closeButton.click();
+  }
 
+  const LocationMarker = ({ vendorID, vendorData }) => {
     return (
       <Marker
-        position={[vendors[id].latitude, vendors[id].longitude]}
+        position={[vendorData.latitude, vendorData.longitude]}
         icon={
           vendors.activeItems && vendors.activeItems > 0 ? blueIcon : greyIcon
         }
       >
-        <Popup>
+        <Popup ref={popupElement}>
           <div>
             <div className="flex flex-row gap-4 items-center mb-2">
-              <img src={vendors[id].avatar} className="w-16" width={64} />
-              <p className="font-bold">{vendors[id].orgName}</p>
+              <img src={vendorData.avatar} className="w-16" width={64} />
+              <p className="font-bold">{vendorData.orgName}</p>
             </div>
-            {vendors[id].activeItems && vendors[id].activeItems ? (
+            {vendorData.activeItems && vendorData.activeItems ? (
               <>
-                <span>Current Listing: {vendors[id].activeItems}</span>
-                <br/>
-                <span>Click <a onClick={() => viewListing(id)} className="link">here</a> to view listing</span>
+                <span>Current Listing: {vendorData.activeItems}</span>
+                <br />
+                <span>
+                  Click{" "}
+                  <a onClick={() => selectVendor(vendorID)} className="link">
+                    here
+                  </a>{" "}
+                  to view listing
+                </span>
               </>
             ) : (
               <span>No active listing</span>
@@ -44,6 +55,11 @@ const MapList = ({ children, viewListing }) => {
         </Popup>
       </Marker>
     );
+  };
+
+  LocationMarker.propTypes = {
+    vendorID: PropTypes.string,
+    vendorData: PropTypes.object,
   };
 
   return (
@@ -60,7 +76,7 @@ const MapList = ({ children, viewListing }) => {
         />
         {children}
         {Object.keys(vendors).map((id) => (
-          <LocationMarker key={id} id={id} />
+          <LocationMarker key={id} vendorID={id} vendorData={vendors[id]} />
         ))}
         <TileLayer
           attribution='&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '

@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { FaCircleInfo, FaList, FaPencil } from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
+import VendorListing from "../../components/list/VendorListing";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
@@ -75,7 +76,12 @@ const Dashboard = () => {
         <progress className="progress w-56 mx-auto progress-primary my-24" />
       ) : user && accountType === "users" ? (
         <>
-          <MapList viewListing={(id) => {setSelectedVendor(id)}} />
+          <MapList
+            viewListing={(id) => {
+              setSelectedVendor(id);
+            }}
+          />
+          <VendorListing vendor={selectedVendor} />
           <div className="m-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
               <li>
@@ -85,7 +91,7 @@ const Dashboard = () => {
                 </Link>
               </li>
               <li>
-                <Link to="listings" className="flex items-center gap-3">
+                <Link to="404" className="flex items-center gap-3">
                   <FaList />
                   See Listings
                 </Link>
