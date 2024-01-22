@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
 import { Link, useNavigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import UserProfile from "../../components/profile/UserProfile";
 import OrgProfile from "../../components/profile/OrgProfile";
 import { toast } from "react-toastify";
@@ -11,61 +8,25 @@ import { FaAngleLeft } from "react-icons/fa6";
 import {
   uploadFirestore,
   uploadProfileFiles,
-} from "../../utils/firebase-upload";
+} from "../../utils/firestore-upload";
+import { useUserContext } from "../../context/UseUserContext";
 
 const EditProfile = () => {
-  const [accountType, setAccountType] = useState("");
-
-  const [formData, setFormData] = useState("");
-
   const navigate = useNavigate();
 
-  let [authUser, setAuthUser] = useState(null);
-  let [user, setUser] = useState(null);
-
+  const [formData, setFormData] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setAuthUser(u);
-    });
-
-    unsubscribe();
-  }, []);
+  const { accountType, authUser, user, loaded } = useUserContext();
 
   useEffect(() => {
-    if (authUser && authUser.uid) {
-      getDoc(doc(db, "accountType", authUser.uid))
-        .then((docSnap) => {
-          if (docSnap.exists()) {
-            setAccountType(docSnap.data().accountType);
-
-            getDoc(doc(db, accountType, authUser.uid))
-              .then((docSnap) => {
-                if (docSnap.exists()) {
-                  setUser(docSnap.data());
-                } else {
-                  toast.error(accountType + " not found!");
-                  console.log("accountType not found!");
-                  navigate("/get-started");
-                }
-              })
-              .catch((error) => {
-                console.log("Error getting document:", error);
-                toast.error(error.message);
-              });
-          } else {
-            navigate("/get-started");
-          }
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
+    if (loaded && (!user)) {
+      navigate("/dashboard");
     }
-  }, [navigate, accountType, authUser]);
+  }, [navigate, loaded, user]);
 
   useEffect(() => {
-    if (formData && !_.isEmpty(formData) && authUser && authUser.uid) {
+    if (formData && !_.isEmpty(formData) && authUser.email && authUser.uid) {
       let obj = {
         ...formData,
         email: authUser.email,
@@ -89,7 +50,7 @@ const EditProfile = () => {
           console.log("Error while uploading file: " + err.message);
         });
     }
-  }, [formData, authUser, navigate, accountType]);
+  }, [formData, navigate, accountType, authUser]);
 
   return (
     <>
@@ -104,9 +65,15 @@ const EditProfile = () => {
           </div>
         </div>
 
-        {accountType === "users" && user && (
+        {(loading || !user) && (
+          <div className="flex justify-center">
+            <progress className="progress w-56 mx-auto progress-primary my-24" />
+          </div>
+        )}
+
+        {user && accountType === "users" && (
           <UserProfile
-            email={user.email}
+            email={authUser.email}
             onChildData={setFormData}
             defaultObj={user}
             loading={loading}
@@ -115,9 +82,9 @@ const EditProfile = () => {
           />
         )}
 
-        {accountType === "vendors" && user && (
+        {user && accountType === "vendors" && (
           <OrgProfile
-            email={user.email}
+            email={authUser.email}
             onChildData={setFormData}
             defaultObj={user}
             loading={loading}
@@ -126,9 +93,9 @@ const EditProfile = () => {
           />
         )}
 
-        {accountType === "charities" && user && (
+        {user && accountType === "charities" && (
           <OrgProfile
-            email={user.email}
+            email={authUser.email}
             charity
             onChildData={setFormData}
             defaultObj={user}
@@ -136,12 +103,6 @@ const EditProfile = () => {
             setLoading={setLoading}
             editProfile
           />
-        )}
-
-        {accountType === "" && (
-          <div className="flex justify-center">
-            <progress className="progress w-56 mx-auto progress-primary my-24" />
-          </div>
         )}
       </div>
     </>

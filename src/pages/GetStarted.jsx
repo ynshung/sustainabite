@@ -7,7 +7,7 @@ import OrgProfile from "../components/profile/OrgProfile";
 import { toast } from "react-toastify";
 import _ from "underscore";
 import { FaAngleLeft } from "react-icons/fa6";
-import { uploadProfileFiles, uploadFirestore } from "../utils/firebase-upload";
+import { uploadProfileFiles, uploadFirestore } from "../utils/firestore-upload";
 
 const GetStarted = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -31,7 +31,7 @@ const GetStarted = () => {
     });
 
     unsubscribe();
-  }, [navigate]);
+  }, [setUser, navigate]);
 
   useEffect(() => {
     if (formData && !_.isEmpty(formData) && user.uid) {
@@ -104,7 +104,7 @@ const GetStarted = () => {
                 />
                 <span className="label-text text-lg">Vendor*</span>
               </label>
-              <label className="label cursor-pointer justify-start gap-4">
+              {/* <label className="label cursor-pointer justify-start gap-4">
                 <input
                   name="accountType"
                   type="radio"
@@ -116,7 +116,7 @@ const GetStarted = () => {
                 <span className="label-text text-lg">
                   Charity Organization*
                 </span>
-              </label>
+              </label> */}
               <p>
                 <span className="text-sm italic opacity-75">
                   * verification needed

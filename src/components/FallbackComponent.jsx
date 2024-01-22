@@ -3,9 +3,9 @@ export function fallbackComponent({ error, resetErrorBoundary }) {
     <div role="alert">
       <br />
       <p>Something went wrong:</p>
-      <pre>{error.message}</pre>
+      <pre className="text-wrap">{error.message}</pre>
       <br />
-      <button className="btn btn-warning" onClick={resetErrorBoundary}>
+      <button className="btn btn-warning btn-sm" onClick={resetErrorBoundary}>
         Reload
       </button>
       <br />

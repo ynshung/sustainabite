@@ -1,58 +1,36 @@
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth, db } from "../../firebase";
-import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { FaChevronLeft, FaCircleInfo, FaList, FaPencil } from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
 import VendorItemsList from "../../components/list/VendorItemsList";
 import VendorList from "../../components/list/VendorList";
 import { getVendors } from "../../utils/get-vendors";
+import { useUserContext } from "../../context/UseUserContext";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
-  let [user, setUser] = useState(null);
-  let [accountType, setAccountType] = useState("");
   const navigate = useNavigate();
 
   let [selectedVendorID, setSelectedVendorID] = useState(null);
 
+  let { authUser, user, accountType, error, loaded } = useUserContext();
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (u) {
-        getDoc(doc(db, "accountType", u.uid))
-          .then((docSnap) => {
-            if (docSnap.exists()) {
-              setAccountType(docSnap.data().accountType);
-
-              getDoc(doc(db, accountType, u.uid))
-                .then((docSnap) => {
-                  if (docSnap.exists()) {
-                    setUser(docSnap.data());
-                    setLoading(false);
-                  } else {
-                    toast.error(accountType + " not found!");
-                    navigate("/get-started");
-                  }
-                })
-                .catch((error) => {
-                  console.log("Error getting document:", error);
-                });
-            } else {
-              navigate("/get-started");
-            }
-          })
-          .catch((error) => {
-            console.log("Error getting document:", error);
-          });
-      } else {
+    if (loaded) {
+      if (!authUser) {
         navigate("/login");
+      } else if (!accountType || !user) {
+        console.log(accountType)
+        console.log(user)
+        navigate("/get-started");
       }
-    });
-
-    unsubscribe();
-  }, [navigate, accountType]);
+      setLoading(false);
+    } else if (error) {
+      toast.error(error);
+      navigate("/login");
+    }
+  }, [authUser, accountType, user, loaded, navigate, error]);
 
   const [vendors, setVendors] = useState({});
 
@@ -111,7 +89,10 @@ const Dashboard = () => {
               <p className="mt-1 mb-4">
                 Total listing: {vendors[selectedVendorID].activeItems}
               </p>
-              <VendorItemsList vendor={selectedVendorID} />
+              <VendorItemsList
+                vendor={selectedVendorID}
+                userType={accountType}
+              />
             </div>
           ) : (
             <div className="mx-8 my-6">
@@ -124,10 +105,13 @@ const Dashboard = () => {
               />
             </div>
           )}
-          <div className="m-8">
+          <div className="mx-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
               <li>
-                <Link to="edit-profile" className="flex items-center gap-3">
+                <Link
+                  to="edit-profile"
+                  className="flex items-center gap-3"
+                >
                   <FaPencil />
                   Edit Your Profile
                 </Link>
@@ -143,6 +127,7 @@ const Dashboard = () => {
               </li>
             </ul>
           </div>
+          <br/>
         </>
       ) : accountType === "vendors" ? (
         <>
@@ -150,19 +135,22 @@ const Dashboard = () => {
             <div className="mx-8">
               <ul className="menu menu-lg bg-base-200 rounded-box">
                 <li>
-                  <Link to="edit-profile" className="flex items-center gap-3">
+                  <Link
+                    to="listing"
+                    className="flex items-center gap-3"
+                  >
+                    <FaList />
+                    View Current Listing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="edit-profile"
+                    className="flex items-center gap-3"
+                  >
                     <FaPencil />
                     Edit Your Profile
                   </Link>
-                </li>
-                <li>
-                  <Link to="listings" className="flex items-center gap-3">
-                    <FaList />
-                    See Listings
-                  </Link>
-                </li>
-                <li>
-                  <a>Item 3</a>
                 </li>
               </ul>
             </div>

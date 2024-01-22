@@ -9,6 +9,24 @@
     "ui": {
       "enabled": true
     },
-    "singleProjectMode": true
-  }
+    "singleProjectMode": true,
+    "functions": {
+      "port": 5001
+    },
+    "storage": {
+      "port": 9199
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ]
 }

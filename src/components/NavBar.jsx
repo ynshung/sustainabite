@@ -1,8 +1,15 @@
 import { TbBell, TbMenuDeep } from "react-icons/tb";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import sustainabite from "../assets/sustainabite-lb-bg.png";
+import { auth } from "../firebase";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { useUserContext } from "../context/UseUserContext";
 
 const NavBar = () => {
+  const navigate = useNavigate();
+  const { authUser, loaded } = useUserContext();
+
   return (
     <div className="navbar shadow-md bg-theme1-50">
       <div className="navbar-start">
@@ -12,17 +19,43 @@ const NavBar = () => {
           </div>
           <ul
             tabIndex="0"
-            className="menu dropdown-content mt-3 bg-theme1-100 z-[1] p-2 shadow-lg rounded-box w-52 "
+            className="menu dropdown-content mt-3 bg-theme1-100 z-[10000] p-2 shadow-lg rounded-box w-52 "
           >
-            <li>
-              <a>Homepage</a>
-            </li>
-            <li>
-              <a>Portfolio</a>
-            </li>
-            <li>
-              <a>About</a>
-            </li>
+            {loaded && authUser ? (
+              <>
+                <li>
+                  <Link to="/dashboard">Dashboard</Link>
+                </li>
+
+                <li>
+                  <a
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "You will be logged out!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, log me out!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          auth.signOut();
+                          toast.success("Logged out successfully!");
+                          navigate("/login");
+                        }
+                      });
+                    }}
+                  >
+                    Logout
+                  </a>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
+            )}
           </ul>
         </div>
       </div>
