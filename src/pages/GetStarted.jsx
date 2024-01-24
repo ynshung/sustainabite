@@ -47,8 +47,7 @@ const GetStarted = () => {
           uploadFirestore(res, user.uid, accountType)
             .then(() => {
               setLoading(false);
-              navigate("/dashboard");
-              window.location.reload();
+              window.location.href = "/dashboard";
             })
             .catch((err) => {
               toast.error(err.message);
@@ -60,7 +59,7 @@ const GetStarted = () => {
 
       // If obj contains proofOfOwnership File, upload to Firebase Storage and replace with downloadURL
     }
-  }, [formData, user, navigate, accountType]);
+  }, [formData, user, accountType]);
 
   const handleAccountTypeChange = (event) => {
     setAccountType(event.target.value);

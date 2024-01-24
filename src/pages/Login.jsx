@@ -2,13 +2,12 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const signIn = (e) => {
     e.preventDefault();
@@ -19,8 +18,7 @@ function Login() {
         const user = userCredential.user;
         console.log(user);
         toast.success("Logged in successfully!");
-        navigate("/dashboard");
-        window.location.reload();
+        window.location.href = "/dashboard";
       })
       .catch((error) => {
         const errorCode = error.code;
