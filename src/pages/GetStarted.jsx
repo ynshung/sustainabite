@@ -47,7 +47,8 @@ const GetStarted = () => {
           uploadFirestore(res, user.uid, accountType)
             .then(() => {
               setLoading(false);
-              navigate("/dashboard", { state: { reload: true } });
+              navigate("/dashboard");
+              window.location.reload();
             })
             .catch((err) => {
               toast.error(err.message);

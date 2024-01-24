@@ -32,10 +32,6 @@ const Dashboard = () => {
   const { pathname, state } = useLocation();
 
   useEffect(() => {
-    if (state && state.reload) {
-      navigate(pathname, {});
-    }
-
     if (loaded) {
       if (!authUser) {
         navigate("/login");

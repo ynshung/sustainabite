@@ -19,7 +19,8 @@ function Login() {
         const user = userCredential.user;
         console.log(user);
         toast.success("Logged in successfully!");
-        navigate("/dashboard", { state: { reload: true } });
+        navigate("/dashboard");
+        window.location.reload();
       })
       .catch((error) => {
         const errorCode = error.code;

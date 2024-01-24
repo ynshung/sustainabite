@@ -10,6 +10,7 @@ import {
   uploadProfileFiles,
 } from "../../utils/firestore-upload";
 import { useUserContext } from "../../context/UseUserContext";
+import ScrollToTop from "../../utils/ScrollToTop";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const EditProfile = () => {
 
   return (
     <>
+      <ScrollToTop />
       <div className="m-6">
         <div className="flex flex-row gap-3 items-center">
           <Link to="/dashboard">
