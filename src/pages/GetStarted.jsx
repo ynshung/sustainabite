@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import _ from "underscore";
 import { FaAngleLeft } from "react-icons/fa6";
 import { uploadProfileFiles, uploadFirestore } from "../utils/firestore-upload";
+import "../no-scroll-wheel.css";
 
 const GetStarted = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -46,8 +47,7 @@ const GetStarted = () => {
           uploadFirestore(res, user.uid, accountType)
             .then(() => {
               setLoading(false);
-              toast.success("Profile submitted!");
-              navigate("/dashboard");
+              navigate("/dashboard", { state: { reload: true } });
             })
             .catch((err) => {
               toast.error(err.message);

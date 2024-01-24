@@ -1,11 +1,16 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { getReservations } from "../../utils/firestore-reservations";
+import {
+  fulfillReservation,
+  getReservations,
+  reportReservation,
+} from "../../utils/firestore-reservations";
 import { getSpecificUser } from "../../utils/firestore-user";
 import { getSpecificListing } from "../../utils/firestore-vendor-listing";
 import { format, formatDistanceToNow } from "date-fns";
 import {
   FaClock,
+  FaMoneyBill,
   FaPhone,
   FaReceipt,
   FaStore,
@@ -13,14 +18,104 @@ import {
   FaUser,
 } from "react-icons/fa6";
 import { getSpecificVendor } from "../../utils/firestore-vendors";
+import _ from "underscore";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
-const ReservationList = ({
-  userUID,
-  userType,
-  reportReservation,
-  confirmPickup,
-}) => {
+const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
   let [reservations, setReservations] = useState(null);
+
+  const preConfirmPickup = (
+    reservationID,
+    userID,
+    userSaved,
+    vendorID,
+    vendorEarned,
+  ) => {
+    Swal.fire({
+      title: "Confirm Pickup?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fulfillReservation(
+          reservationID,
+          userID,
+          userSaved,
+          vendorID,
+          vendorEarned,
+        );
+        toast.success("Reservation fulfilled!");
+      }
+    });
+  };
+
+  const preReportReservation = async (reservationID) => {
+    let reasons;
+
+    if (userType === "users") {
+      reasons = [
+        "Vendor is closed and did not respond",
+        "Item is not as described",
+        "Item is not available",
+        "Other",
+      ];
+    } else if (userType === "vendors") {
+      reasons = [
+        "User did not show up (>15 minutes)",
+        "User did not confirm pickup",
+        "Other",
+      ];
+    }
+
+    const { value: reason } = await Swal.fire({
+      title: "Report Reservation",
+      html: `<p>Please select a reason for reporting this reservation:</p>`,
+      input: "select",
+      inputOptions: reasons,
+      inputPlaceholder: "Select a reason",
+      showCancelButton: true,
+      confirmButtonText: "Report",
+      cancelButtonText: "Cancel",
+      inputValidator: (value) => {
+        if (!value) {
+          return "You need to select a reason!";
+        }
+      },
+    });
+
+    if (!reason) return;
+
+    const { value: comments } = Swal.fire({
+      title: "Report Reservation",
+      html: `<p>Please provide a clear description for your report:</p>`,
+      input: "textarea",
+      inputPlaceholder: "Enter your description here...",
+      showCancelButton: true,
+      confirmButtonText: "Report",
+      cancelButtonText: "Cancel",
+      inputValidator: (value) => {
+        if (reason === "Other" && !value) {
+          return "You need to provide a description!";
+        }
+      },
+    });
+
+    if (comments) {
+      reportReservation(
+        reservationID,
+        userUID,
+        userType,
+        reason,
+        comments,
+      ).then(() => {
+        toast.success("Reservation reported!");
+      });
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = getReservations(
@@ -28,12 +123,13 @@ const ReservationList = ({
       setReservations,
       userUID,
       userType.slice(0, -1),
+      showFulfilled,
     );
 
     return () => {
       unsubscribe();
     };
-  }, [reservations, userUID, userType]);
+  }, [reservations, userUID, userType, showFulfilled]);
 
   const ReservationDetails = ({ reservation, id }) => {
     const [user, setUser] = useState(null);
@@ -41,7 +137,7 @@ const ReservationList = ({
     const [vendor, setVendor] = useState(null);
 
     const [reservationDate, setReservationDate] = useState(
-      reservation.createdAt.toDate() ?? null,
+      reservation.createdAt ? reservation.createdAt.toDate() ?? null : null,
     );
 
     useEffect(() => {
@@ -86,7 +182,7 @@ const ReservationList = ({
       reservation &&
       reservationDate &&
       item &&
-      user && (
+      (user || vendor) && (
         <div>
           <div className="flex justify-between px-4">
             <div className="">
@@ -94,7 +190,7 @@ const ReservationList = ({
             </div>
             <div>
               <div
-                onClick={() => reportReservation(id)}
+                onClick={() => preReportReservation(id)}
                 className="flex flex-row items-center gap-2 text-sm text-error cursor-pointer"
               >
                 <FaTriangleExclamation /> Report
@@ -108,26 +204,40 @@ const ReservationList = ({
               <span>{item.name}</span>
               <span>(x{reservation.qty})</span>
             </div>
-            {userType === "users" && (
+            <div className="flex flex-row items-center gap-2 col-span-2">
+              <FaMoneyBill />
+              <span>RM{(item.price * reservation.qty).toFixed(2)}</span>
+            </div>
+            {userType === "users" ? (
               <div className="flex flex-row items-center gap-2 col-span-2">
                 <FaStore />
                 <span>{vendor.orgName}</span>
               </div>
-            )}
-            {userType === "vendors" && (
-              <div className="flex flex-row items-center gap-2">
-                <FaUser />
-                <span>{user.firstName}</span>
-              </div>
+            ) : (
+              userType === "vendors" && (
+                <div className="flex flex-row items-center gap-2">
+                  <FaUser />
+                  <span>{user.firstName}</span>
+                </div>
+              )
             )}
             <div className="flex flex-row items-center gap-2">
               <FaPhone />
-              <a
-                href={`tel:${normalizedPhoneNumber(user.phoneNumber)}`}
-                className="hover:underline"
-              >
-                {user.phoneNumber}
-              </a>
+              {userType === "users" ? (
+                <a
+                  href={`tel:${normalizedPhoneNumber(vendor.phoneNumber)}`}
+                  className="hover:underline"
+                >
+                  {vendor.phoneNumber}
+                </a>
+              ) : (
+                <a
+                  href={`tel:${normalizedPhoneNumber(user.phoneNumber)}`}
+                  className="hover:underline"
+                >
+                  {user.phoneNumber}
+                </a>
+              )}
             </div>
             <div className="flex flex-row items-center gap-2">
               <FaClock />
@@ -141,7 +251,15 @@ const ReservationList = ({
             {userType === "users" && (
               <div className="mt-3 col-span-2 mx-auto">
                 <button
-                  onClick={() => confirmPickup(id)}
+                  onClick={() =>
+                    preConfirmPickup(
+                      id,
+                      reservation.user,
+                      (+item.oriPrice - +item.price) * +reservation.qty,
+                      reservation.vendor,
+                      +item.price * +reservation.qty,
+                    )
+                  }
                   className="btn btn-primary text-white btn-sm"
                 >
                   Confirm Pickup
@@ -161,7 +279,7 @@ const ReservationList = ({
 
   return (
     <>
-      {reservations ? (
+      {reservations && _.isEmpty(reservations) !== 0 ? (
         Object.keys(reservations).map((key) => {
           const reservation = reservations[key];
           return (
@@ -180,8 +298,8 @@ const ReservationList = ({
 ReservationList.propTypes = {
   userUID: PropTypes.string,
   userType: PropTypes.string,
-  reportReservation: PropTypes.func,
   confirmPickup: PropTypes.func,
+  showFulfilled: PropTypes.bool,
 };
 
 export default ReservationList;

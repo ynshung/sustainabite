@@ -19,6 +19,7 @@ import EditProfile from "./pages/dashboard/EditProfile";
 import VendorListing from "./pages/dashboard/VendorListing";
 import NewListing from "./pages/dashboard/NewListing";
 import EditListing from "./pages/dashboard/EditListing";
+import ReservationHistory from "./pages/dashboard/ReservationHistory";
 
 export function App() {
 
@@ -31,7 +32,7 @@ export function App() {
             <NavBar />
             <Routes>
               <Route path="/" element={<Home />} />
-  
+
               <Route element={<CenterElement />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -39,11 +40,12 @@ export function App() {
                 <Route path="/get-started" element={<GetStarted />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
-  
+
               <Route path="/dashboard">
                 <Route index element={<Dashboard />} />
                 <Route element={<CenterElement />}>
                   <Route path="edit-profile" element={<EditProfile />} />
+                  <Route path="history" element={<ReservationHistory />} />
                 </Route>
                 <Route path="listing">
                   <Route index element={<VendorListing />} />
@@ -53,7 +55,7 @@ export function App() {
                   </Route>
                 </Route>
               </Route>
-  
+
               <Route path="/admin/dashboard" />
             </Routes>
           </div>

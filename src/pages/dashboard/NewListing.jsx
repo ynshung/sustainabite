@@ -15,7 +15,7 @@ const NewListing = () => {
 
   useEffect(() => {
     if (loaded && !authUser) {
-      navigate("/dashboard");
+      navigate("/dashboard", { reload: true });
     }
   }, [navigate, loaded, authUser]);
 

@@ -1,10 +1,49 @@
 import { useEffect, useRef, useState } from "react";
 import { getVendorListing } from "../../utils/firestore-vendor-listing";
 import PropTypes from "prop-types";
+import Swal from "sweetalert2";
+import { createReservation } from "../../utils/firestore-reservations";
+import { toast } from "react-toastify";
 
-const VendorItemsList = ({ vendor, selectItem, userType }) => {
+const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
   const [vendorListing, setVendorListing] = useState({});
   const [loading, setLoading] = useState(true);
+
+  const preSelectItem = async (id, maxQty, itemPrice) => {
+    const { value: qty } = await Swal.fire({
+      title: "Reserve Quantity",
+      html: `How much you would like to reserve?<br/><b>Maximum: ${maxQty}</b>`,
+      input: "number",
+      inputPlaceholder: "Enter quantity",
+      showCancelButton: true,
+      inputAttributes: {
+        min: 1,
+        max: maxQty,
+        range: 1,
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return "You need to enter a quantity!";
+        } else if (value > maxQty) {
+          return "You cannot reserve more than the maximum quantity!";
+        }
+      }
+    });
+
+    if (!qty) return;
+
+    const { value: confirm } = await Swal.fire({
+      title: "Confirm reservation?",
+      html: `You are reserving <b>${qty} item${qty > 1 ? "s" : ""}</b>.<br/>Total price: <b>RM${(qty * itemPrice).toFixed(2)}</b> (COD)`,
+      showCancelButton: true,
+    });
+    
+    if (confirm) {
+      // Item ID, Quantity, Vendor ID
+      createReservation(userUID, id, qty, vendor);
+      toast.success("Reservation created!");
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = getVendorListing(
@@ -26,7 +65,7 @@ const VendorItemsList = ({ vendor, selectItem, userType }) => {
         <>
           <p>RM{Number(price).toFixed(2)}</p>
           <button
-            onClick={() => selectItem(id)}
+            onClick={() => preSelectItem(id, qty, price)}
             className="btn btn-primary btn-sm text-white shadow"
           >
             Reserve
@@ -55,14 +94,7 @@ const VendorItemsList = ({ vendor, selectItem, userType }) => {
       );
     } else if (userType === "charities") {
       return (
-        <>
-          <button
-            onClick={() => selectItem(id)}
-            className="btn btn-primary btn-sm text-white shadow"
-          >
-            Reserve
-          </button>
-        </>
+          <p>Not implemented yet</p>
       );
     }
   };
@@ -74,7 +106,7 @@ const VendorItemsList = ({ vendor, selectItem, userType }) => {
     qty: PropTypes.number,
   };
 
-  const ItemCard = ({vendor, id}) => {
+  const ItemCard = ({ vendor, id }) => {
     const { name, price, img, desc, qty, active } = vendor;
     const modalRef = useRef(null);
     return (
@@ -132,6 +164,7 @@ VendorItemsList.propTypes = {
   vendor: PropTypes.string,
   selectItem: PropTypes.func,
   userType: PropTypes.string,
+  userUID: PropTypes.string,
 };
 
 export default VendorItemsList;

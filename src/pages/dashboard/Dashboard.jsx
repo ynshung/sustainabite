@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   FaBook,
   FaChevronLeft,
   FaCircleInfo,
+  FaClockRotateLeft,
   FaList,
   FaPencil,
 } from "react-icons/fa6";
@@ -17,13 +18,19 @@ import ReservationList from "../../components/list/ReservationList";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   let [selectedVendorID, setSelectedVendorID] = useState(null);
 
   let { authUser, user, accountType, error, loaded } = useUserContext();
 
+  const navigate = useNavigate();
+  const { pathname, state } = useLocation();
+
   useEffect(() => {
+    if (state && state.reload) {
+      navigate(pathname, {});
+    }
+
     if (loaded) {
       if (!authUser) {
         navigate("/login");
@@ -35,9 +42,13 @@ const Dashboard = () => {
       setLoading(false);
     } else if (error) {
       toast.error(error);
-      navigate("/login");
+      if (
+        error === "Account type not found! Redirecting to Get Started page..."
+      )
+        navigate("/get-started");
+      else navigate("/login");
     }
-  }, [authUser, accountType, user, loaded, navigate, error]);
+  }, [authUser, user, accountType, error, loaded, navigate, pathname, state]);
 
   const [vendors, setVendors] = useState({});
 
@@ -73,6 +84,22 @@ const Dashboard = () => {
         <progress className="progress w-56 mx-auto progress-primary my-24" />
       ) : user && (accountType === "users" || accountType === "charities") ? (
         <>
+          {user.currentReservation && user.currentReservation > 0 && (
+            <>
+              <hr className="pb-4" />
+              <div className="mx-8">
+                <div className="flex items-center gap-3">
+                  <FaBook size={18} />{" "}
+                  <h2 className="font-bold text-xl">Current Reservations</h2>
+                </div>
+                <ReservationList
+                  userUID={authUser.uid}
+                  userType={accountType}
+                />
+              </div>
+            </>
+          )}
+
           <MapList
             viewListing={(id) => {
               setSelectedVendorID(id);
@@ -99,6 +126,7 @@ const Dashboard = () => {
               <VendorItemsList
                 vendor={selectedVendorID}
                 userType={accountType}
+                userUID={authUser.uid}
               />
             </div>
           ) : (
@@ -112,8 +140,15 @@ const Dashboard = () => {
               />
             </div>
           )}
+          <hr className="mb-8" />
           <div className="mx-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
+              <li>
+                <Link to="history" className="flex items-center gap-3">
+                  <FaClockRotateLeft />
+                  Reservation History
+                </Link>
+              </li>
               <li>
                 <Link to="edit-profile" className="flex items-center gap-3">
                   <FaPencil />

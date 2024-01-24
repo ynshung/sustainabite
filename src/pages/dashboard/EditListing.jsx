@@ -20,9 +20,7 @@ const EditListing = () => {
   let [listing, setListing] = useState(null);
 
   useEffect(() => {
-    console.log(id);
     if (loaded) {
-      console.log(id);
       if (!authUser || !id) {
         navigate("/dashboard/listing");
       } else {

@@ -99,18 +99,37 @@ const VendorItem = ({
           </div>
           <div>
             <label className="label">
-              <span className="label-text">Quantity</span>
+              <span className="label-text">Original Price</span>
             </label>
-            <input
-              type="number"
-              className="input input-bordered w-20"
-              placeholder="3"
-              min="1"
-              step="1"
-              required
-              {...register("qty")}
-            />
+            <div className="join">
+              <div className="btn btn-disabled join-item">
+                <span className="text-gray-600">RM</span>
+              </div>
+              <input
+                type="number"
+                className="input input-bordered w-24 join-item"
+                placeholder="8.00"
+                step="0.01"
+                min={getValues("price") ? getValues("price") : "1.00"}
+                required
+                {...register("oriPrice")}
+              />
+            </div>
           </div>
+        </div>
+        <div>
+          <label className="label">
+            <span className="label-text">Available Quantity</span>
+          </label>
+          <input
+            type="number"
+            className="input input-bordered w-20"
+            placeholder="3"
+            min="1"
+            step="1"
+            required
+            {...register("qty")}
+          />
         </div>
         <div className="my-3">
           <label className="label">

@@ -46,15 +46,18 @@ const VendorList = ({ vendors, viewListing, doGetCurrLoc = true }) => {
                 <div>
                   <h2 className="card-title">{orgName}</h2>
                   <p>
-                    {activeItems ? activeItems : "No"} active listing{activeItems > 1 && "s"}
+                    {activeItems ? activeItems : "No"} active listing
+                    {activeItems > 1 && "s"}
                   </p>
                 </div>
               </div>
               <div className="flex flex-col gap-1 font-bold justify-center items-center">
-                <p className="text-center text-nowrap">
-                  <RiPinDistanceFill className="inline mr-1" />
-                  {distance}
-                </p>
+                {distance !== "" && (
+                  <p className="text-center text-nowrap">
+                    <RiPinDistanceFill className="inline mr-1" />
+                    {distance}
+                  </p>
+                )}
                 <button
                   onClick={() => viewListing(vendorID)}
                   className="btn btn-primary btn-sm text-white text-nowrap"

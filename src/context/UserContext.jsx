@@ -43,7 +43,7 @@ export function UserProvider({ children }) {
                     setError(error.message);
                   });
               } else {
-                setError("Account type not found!");
+                setError("Account type not found! Redirecting to Get Started page...");
               }
             })
             .catch((error) => {

@@ -19,7 +19,7 @@ function Login() {
         const user = userCredential.user;
         console.log(user);
         toast.success("Logged in successfully!");
-        navigate("/dashboard");
+        navigate("/dashboard", { state: { reload: true } });
       })
       .catch((error) => {
         const errorCode = error.code;

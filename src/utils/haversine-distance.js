@@ -19,7 +19,9 @@ export function haversineDistance(lat1, lon1, lat2, lon2) {
 
 export function haversineDistanceFormatted(lat1, lon1, lat2, lon2) {
   const distance = haversineDistance(lat1, lon1, lat2, lon2);
-  if (distance < 1000) {
+  if (!distance) {
+    return;
+  } else if (distance < 1000) {
     return `${Math.round(distance)}m`;
   } else {
     return `${(distance / 1000).toFixed(1)}km`;
