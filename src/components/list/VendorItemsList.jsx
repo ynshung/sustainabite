@@ -27,17 +27,21 @@ const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
         } else if (value > maxQty) {
           return "You cannot reserve more than the maximum quantity!";
         }
-      }
+      },
     });
 
     if (!qty) return;
 
     const { value: confirm } = await Swal.fire({
       title: "Confirm reservation?",
-      html: `You are reserving <b>${qty} item${qty > 1 ? "s" : ""}</b>.<br/>Total price: <b>RM${(qty * itemPrice).toFixed(2)}</b> (COD)`,
+      html: `You are reserving <b>${qty} item${
+        qty > 1 ? "s" : ""
+      }</b>.<br/>Total price: <b>RM${(qty * itemPrice).toFixed(
+        2,
+      )}</b> (COD)<br/><br/>Please make sure to click "Confirm Pickup" after you have picked up your items.`,
       showCancelButton: true,
     });
-    
+
     if (confirm) {
       // Item ID, Quantity, Vendor ID
       createReservation(userUID, id, qty, vendor);
@@ -93,9 +97,7 @@ const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
         </div>
       );
     } else if (userType === "charities") {
-      return (
-          <p>Not implemented yet</p>
-      );
+      return <p>Not implemented yet</p>;
     }
   };
 
@@ -119,7 +121,7 @@ const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
             <button>close</button>
           </form>
         </dialog>
-        <div className="card card-compact bg-base-100 shadow-xl mb-8">
+        <div className="card card-compact bg-base-100 shadow-lg mb-8">
           <figure className="w-full h-48">
             <div
               onClick={() => modalRef.current.showModal()}

@@ -84,10 +84,12 @@ export const fulfillReservation = async (
 
   await updateDoc(doc(db, "users", userID), {
     currentReservation: increment(-1),
+    totalReservation: increment(1),
     totalSaved: increment(userSaved),
   });
 
   await updateDoc(doc(db, "vendors", vendorID), {
+    totalReservation: increment(1),
     totalEarned: increment(vendorEarned),
   });
 

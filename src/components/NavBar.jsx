@@ -60,7 +60,7 @@ const NavBar = () => {
         </div>
       </div>
       <div className="navbar-center">
-        <Link to="/" className="btn btn-ghost text-xl">
+        <Link to={loaded && authUser ? "/dashboard" : "/"} className="btn btn-ghost text-xl">
           <img src={sustainabite} width={32} height={32}></img>SustainaBite
         </Link>
       </div>

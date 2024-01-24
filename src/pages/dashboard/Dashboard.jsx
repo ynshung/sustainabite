@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
+  FaArrowUpRightFromSquare,
   FaBook,
+  FaBookBookmark,
   FaChevronLeft,
   FaCircleInfo,
   FaClockRotateLeft,
+  FaHandHoldingDollar,
   FaList,
   FaPencil,
+  FaPlus,
 } from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
 import VendorItemsList from "../../components/list/VendorItemsList";
@@ -15,6 +19,7 @@ import VendorList from "../../components/list/VendorList";
 import { getVendors } from "../../utils/firestore-vendors";
 import { useUserContext } from "../../context/UseUserContext";
 import ReservationList from "../../components/list/ReservationList";
+import { normalizePhoneNumber } from "../../utils/normalize-phone-no";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
@@ -60,6 +65,18 @@ const Dashboard = () => {
     };
   }, [vendors]);
 
+  const tryScrollVendorList = () => {
+    setTimeout(() => {
+      let scrollInterval = setInterval(() => {
+        const element = document.getElementById("vendor-item-list");
+        if (element) {
+          element.scrollIntoView();
+          clearInterval(scrollInterval);
+        }
+      }, 100);
+    }, 100);
+  };
+
   return (
     <>
       {!loading && (
@@ -96,19 +113,22 @@ const Dashboard = () => {
                   userUID={authUser.uid}
                   userType={accountType}
                 />
+                <br />
               </div>
             </>
           )}
 
+          <div id="map" />
           <MapList
             viewListing={(id) => {
               setSelectedVendorID(id);
+              tryScrollVendorList();
             }}
             selectedVendorID={selectedVendorID}
             vendors={vendors}
           />
           {selectedVendorID ? (
-            <div className="m-8">
+            <div className="mx-8 mt-8">
               <div
                 className="flex flex-row items-center gap-2 cursor-pointer"
                 onClick={() => setSelectedVendorID(null)}
@@ -116,13 +136,32 @@ const Dashboard = () => {
                 <FaChevronLeft className="inline" size={18} /> Go back to Vendor
                 List
               </div>
-              <hr className="my-4" />
+              <hr className="my-4" id="vendor-item-list" />
               <h2 className="font-bold text-3xl">
                 {vendors[selectedVendorID].orgName}
               </h2>
-              <p className="mt-1 mb-4">
-                Total listing: {vendors[selectedVendorID].activeItems}
-              </p>
+              <div className="flex flex-row justify-between items-end mb-4 mt-1">
+                <div>
+                  <a
+                    href={`tel:${normalizePhoneNumber(
+                      vendors[selectedVendorID].phoneNumber,
+                    )}`}
+                    className="hover:underline"
+                  >
+                    Phone No.: {vendors[selectedVendorID].phoneNumber}
+                  </a>
+                  <p>Total listing: {vendors[selectedVendorID].activeItems}</p>
+                </div>
+                <a
+                  href={`http://maps.google.com/maps?q=${vendors[selectedVendorID].latitude},${vendors[selectedVendorID].longitude}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm flex flex-row items-center gap-2 hover:underline"
+                >
+                  View on Google Maps
+                  <FaArrowUpRightFromSquare size={12} />
+                </a>
+              </div>
               <VendorItemsList
                 vendor={selectedVendorID}
                 userType={accountType}
@@ -136,11 +175,35 @@ const Dashboard = () => {
                 vendors={vendors}
                 viewListing={(id) => {
                   setSelectedVendorID(id);
+                  tryScrollVendorList();
                 }}
               />
             </div>
           )}
-          <hr className="mb-8" />
+          <hr />
+
+          <div className="mx-auto my-6">
+            <div className="stats shadow bg-theme1-100">
+              <div className="stat">
+                <div className="stat-figure text-secondary">
+                  <FaBookBookmark size={24} />
+                </div>
+                <div className="stat-title">Reservation</div>
+                <div className="stat-value">{user.totalReservation ?? 0}</div>
+              </div>
+
+              <div className="stat">
+                <div className="stat-figure text-secondary">
+                  <FaHandHoldingDollar size={28} />
+                </div>
+                <div className="stat-title">Money Saved</div>
+                <div className="stat-value">
+                  RM{user.totalSaved.toFixed(2) ?? 0}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="mx-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
               <li>
@@ -175,11 +238,25 @@ const Dashboard = () => {
                 />
               </div>
               <br />
+              {}
+              <br />
               <ul className="menu menu-lg bg-base-200 rounded-box">
                 <li>
                   <Link to="listing" className="flex items-center gap-3">
                     <FaList />
                     View Current Listing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="listing/new" className="flex items-center gap-3">
+                    <FaPlus />
+                    Create New Listing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="history" className="flex items-center gap-3">
+                    <FaClockRotateLeft />
+                    Reservation History
                   </Link>
                 </li>
                 <li>
@@ -189,6 +266,7 @@ const Dashboard = () => {
                   </Link>
                 </li>
               </ul>
+              <br />
             </div>
           ) : (
             <div className="mx-8">

@@ -22,7 +22,6 @@ import EditListing from "./pages/dashboard/EditListing";
 import ReservationHistory from "./pages/dashboard/ReservationHistory";
 
 export function App() {
-
   return (
     <ErrorBoundary FallbackComponent={fallbackComponent}>
       <BrowserRouter>
@@ -45,8 +44,8 @@ export function App() {
                 <Route index element={<Dashboard />} />
                 <Route element={<CenterElement />}>
                   <Route path="edit-profile" element={<EditProfile />} />
-                  <Route path="history" element={<ReservationHistory />} />
                 </Route>
+                <Route path="history" element={<ReservationHistory />} />
                 <Route path="listing">
                   <Route index element={<VendorListing />} />
                   <Route element={<CenterElement />}>

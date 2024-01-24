@@ -1,13 +1,14 @@
 import { db, storage } from "../firebase";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 async function uploadFirestore(obj, uid, accountType, isUpdate = false) {
   if (accountType === "vendors") {
     obj.latitude = parseFloat(obj.latitude);
     obj.longitude = parseFloat(obj.longitude);
-    console.log(obj.latitude, obj.longitude);
   }
+
+  obj.createdAt = serverTimestamp();
 
   await setDoc(doc(db, "accountType", uid), {
     accountType: accountType,

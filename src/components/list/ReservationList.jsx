@@ -9,6 +9,7 @@ import { getSpecificUser } from "../../utils/firestore-user";
 import { getSpecificListing } from "../../utils/firestore-vendor-listing";
 import { format, formatDistanceToNow } from "date-fns";
 import {
+  FaArrowUpRightFromSquare,
   FaClock,
   FaMoneyBill,
   FaPhone,
@@ -18,6 +19,7 @@ import {
   FaUser,
 } from "react-icons/fa6";
 import { getSpecificVendor } from "../../utils/firestore-vendors";
+import { normalizePhoneNumber } from "../../utils/normalize-phone-no";
 import _ from "underscore";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -34,7 +36,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
   ) => {
     Swal.fire({
       title: "Confirm Pickup?",
-      text: "This action cannot be undone!",
+      text: "This confirms that you had successfully picked up your order. This action cannot be undone!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Confirm",
@@ -89,7 +91,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
 
     if (!reason) return;
 
-    const { value: comments } = Swal.fire({
+    const { value: comments } = await Swal.fire({
       title: "Report Reservation",
       html: `<p>Please provide a clear description for your report:</p>`,
       input: "textarea",
@@ -98,22 +100,21 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
       confirmButtonText: "Report",
       cancelButtonText: "Cancel",
       inputValidator: (value) => {
-        if (reason === "Other" && !value) {
+        if (!value) {
           return "You need to provide a description!";
         }
       },
     });
 
     if (comments) {
-      reportReservation(
+      await reportReservation(
         reservationID,
         userUID,
         userType,
         reason,
         comments,
-      ).then(() => {
-        toast.success("Reservation reported!");
-      });
+      );
+      toast.success("Reservation reported!");
     }
   };
 
@@ -166,35 +167,32 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
       };
     }, [reservation]);
 
-    const normalizedPhoneNumber = (phoneNumber) => {
-      if (!phoneNumber) return;
-      phoneNumber = phoneNumber.replace(/\s/g, "");
-      if (phoneNumber.substring(0, 2) !== "+6") {
-        return "+6" + phoneNumber;
-      } else if (phoneNumber.charAt(0) !== "+") {
-        return "+" + phoneNumber;
-      } else {
-        return phoneNumber;
-      }
-    };
-
     return (
       reservation &&
       reservationDate &&
       item &&
       (user || vendor) && (
         <div>
-          <div className="flex justify-between px-4">
+          <div className="flex justify-between items-center px-4">
             <div className="">
               Reservation ID:<code className="mx-2">{id.substring(0, 6)}</code>
             </div>
-            <div>
-              <div
-                onClick={() => preReportReservation(id)}
-                className="flex flex-row items-center gap-2 text-sm text-error cursor-pointer"
-              >
-                <FaTriangleExclamation /> Report
-              </div>
+            <div className="text-xs">
+              {!reservation.reported ? (
+                <div
+                  onClick={() => preReportReservation(id)}
+                  className="flex flex-row items-center gap-2 text-theme1-500 cursor-pointer"
+                >
+                  <FaTriangleExclamation /> Report Issue
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-row items-center gap-2 text-error">
+                    <FaTriangleExclamation /> Reported by{" "}
+                    {reservation.reportedByType.slice(0, -1)}
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <hr className="my-2" />
@@ -209,9 +207,19 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
               <span>RM{(item.price * reservation.qty).toFixed(2)}</span>
             </div>
             {userType === "users" ? (
-              <div className="flex flex-row items-center gap-2 col-span-2">
-                <FaStore />
-                <span>{vendor.orgName}</span>
+              <div className="col-span-2">
+                <a
+                  href={`http://maps.google.com/maps?q=${vendor.latitude},${vendor.longitude}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-row items-center gap-2 hover:underline"
+                >
+                  <FaStore />
+                  <div className="flex flex-row items-center gap-2 hover:underline">
+                    <span>{vendor.orgName}</span>
+                    <FaArrowUpRightFromSquare size={12} />
+                  </div>
+                </a>
               </div>
             ) : (
               userType === "vendors" && (
@@ -225,14 +233,14 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
               <FaPhone />
               {userType === "users" ? (
                 <a
-                  href={`tel:${normalizedPhoneNumber(vendor.phoneNumber)}`}
+                  href={`tel:${normalizePhoneNumber(vendor.phoneNumber)}`}
                   className="hover:underline"
                 >
                   {vendor.phoneNumber}
                 </a>
               ) : (
                 <a
-                  href={`tel:${normalizedPhoneNumber(user.phoneNumber)}`}
+                  href={`tel:${normalizePhoneNumber(user.phoneNumber)}`}
                   className="hover:underline"
                 >
                   {user.phoneNumber}
@@ -242,13 +250,13 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
             <div className="flex flex-row items-center gap-2">
               <FaClock />
               <span
-                className="col-span-2 tooltip tooltip-bottom tooltip-secondary"
+                className="tooltip tooltip-bottom tooltip-secondary"
                 data-tip={format(reservationDate, "dd/MM/yyyy h:mm:ssa")}
               >
                 {formatDistanceToNow(reservationDate)} ago
               </span>
             </div>
-            {userType === "users" && (
+            {userType === "users" && !reservation.userFulfilled && (
               <div className="mt-3 col-span-2 mx-auto">
                 <button
                   onClick={() =>
