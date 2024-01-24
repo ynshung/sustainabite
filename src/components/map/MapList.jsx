@@ -69,7 +69,7 @@ const MapList = ({ viewListing, selectedVendorID, vendors }) => {
       >
         <CurrentLocation
           showPosition={true}
-          jumpToCurrLoc={false} // TODO: change this to true for demo
+          jumpToCurrLoc={true}
         />
         {Object.keys(vendors).map((id) => (
           <LocationMarker key={id} vendorID={id} vendorData={vendors[id]} />
