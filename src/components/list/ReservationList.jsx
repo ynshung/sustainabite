@@ -8,7 +8,7 @@ import {
 } from "../../utils/firestore-reservations";
 import { getSpecificUser } from "../../utils/firestore-user";
 import { getSpecificListing } from "../../utils/firestore-vendor-listing";
-import { format, formatDistanceToNow } from "date-fns";
+import { differenceInMinutes, format, formatDistanceToNow } from "date-fns";
 import {
   FaArrowUpRightFromSquare,
   FaClock,
@@ -260,45 +260,60 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
                 {formatDistanceToNow(reservationDate)} ago
               </span>
             </div>
-            {userType === "users" && !reservation.userFulfilled && (
-              <div className="flex gap-2 mt-3 col-span-2 mx-auto">
-                <button
-                  onClick={() =>
-                    preConfirmPickup(
-                      id,
-                      reservation.user,
-                      (+item.oriPrice - +item.price) * +reservation.qty,
-                      reservation.vendor,
-                      +item.price * +reservation.qty,
-                    )
-                  }
-                  className="btn btn-primary text-white btn-sm"
-                >
-                  Confirm Pickup
-                </button>
-                <button
-                  onClick={() =>
-                    Swal.fire({
-                      title: "Cancel Reservation?",
-                      text: "This action cannot be undone!",
-                      icon: "warning",
-                      showCancelButton: true,
-                      confirmButtonText: "Cancel Reservation",
-                      cancelButtonText: "Cancel",
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        cancelReservation(id, reservation.user, reservation.listing, reservation.qty).then(() =>
-                          toast.success("Reservation cancelled!"),
-                        );
+            <div className="flex gap-2 mt-3 col-span-2 mx-auto">
+              {!reservation.userFulfilled && (
+                <>
+                  {userType === "users" && (
+                    <button
+                      onClick={() =>
+                        preConfirmPickup(
+                          id,
+                          reservation.user,
+                          (+item.oriPrice - +item.price) * +reservation.qty,
+                          reservation.vendor,
+                          +item.price * +reservation.qty,
+                        )
                       }
-                    })
-                  }
-                  className="btn btn-warning text-white btn-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+                      className="btn btn-primary text-white btn-sm"
+                    >
+                      Confirm Pickup
+                    </button>
+                  )}
+                  {(userType === "users" ||
+                    (userType === "vendors" &&
+                      Math.abs(
+                        differenceInMinutes(Date.now(), reservationDate),
+                      ) > 15)) && (
+                    <button
+                      onClick={() =>
+                        Swal.fire({
+                          title: "Cancel Reservation?",
+                          text: "This action cannot be undone!",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonText: "Cancel Reservation",
+                          cancelButtonText: "Cancel",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            cancelReservation(
+                              id,
+                              reservation.user,
+                              reservation.listing,
+                              reservation.qty,
+                            ).then(() =>
+                              toast.success("Reservation cancelled!"),
+                            );
+                          }
+                        })
+                      }
+                      className="btn btn-warning text-white btn-sm"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )
@@ -316,7 +331,10 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
         Object.keys(reservations).map((key) => {
           const reservation = reservations[key];
           return (
-            <div className="my-4 bg-theme1-50 rounded px-2 py-4 shadow" key={key}>
+            <div
+              className="my-4 bg-theme1-50 rounded px-2 py-4 shadow"
+              key={key}
+            >
               <ReservationDetails reservation={reservation} id={key} />
             </div>
           );

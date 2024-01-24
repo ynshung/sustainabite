@@ -38,7 +38,7 @@ const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
         qty > 1 ? "s" : ""
       }</b>.<br/>Total price: <b>RM${(qty * itemPrice).toFixed(
         2,
-      )}</b> (COD)<br/><br/>Please make sure to click "Confirm Pickup" after you have picked up your items.`,
+      )}</b> (COD)<br/><br/>Please make sure to click "Confirm Pickup" after you have picked up your items. Vendors have the right to cancel your reservation within <b>15 minutes</b>.`,
       showCancelButton: true,
     });
 
