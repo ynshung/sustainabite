@@ -57,7 +57,7 @@ export function UserProvider({ children }) {
     }
 
     return () => {
-      unsubscribe();
+      if (unsubscribe) unsubscribe();
     };
   }, [accountType, authUser, user, loaded]);
 

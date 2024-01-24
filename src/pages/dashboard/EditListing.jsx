@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import ScrollToTop from "../../utils/ScrollToTop";
 import { useUserContext } from "../../context/UseUserContext";
 import PropTypes from "prop-types";
-import { getSpecificListing } from "../../utils/get-vendor-listing";
+import { getSpecificListing } from "../../utils/firestore-vendor-listing";
 
 const EditListing = () => {
   const [loading, setLoading] = useState(false);

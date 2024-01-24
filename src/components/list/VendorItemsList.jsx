@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getVendorListing } from "../../utils/get-vendor-listing";
+import { getVendorListing } from "../../utils/firestore-vendor-listing";
 import PropTypes from "prop-types";
 
 const VendorItemsList = ({ vendor, selectItem, userType }) => {

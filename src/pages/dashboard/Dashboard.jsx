@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { FaChevronLeft, FaCircleInfo, FaList, FaPencil } from "react-icons/fa6";
+import {
+  FaBook,
+  FaChevronLeft,
+  FaCircleInfo,
+  FaList,
+  FaPencil,
+} from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
 import VendorItemsList from "../../components/list/VendorItemsList";
 import VendorList from "../../components/list/VendorList";
-import { getVendors } from "../../utils/get-vendors";
+import { getVendors } from "../../utils/firestore-vendors";
 import { useUserContext } from "../../context/UseUserContext";
+import ReservationList from "../../components/list/ReservationList";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
@@ -21,8 +28,8 @@ const Dashboard = () => {
       if (!authUser) {
         navigate("/login");
       } else if (!accountType || !user) {
-        console.log(accountType)
-        console.log(user)
+        console.log(accountType);
+        console.log(user);
         navigate("/get-started");
       }
       setLoading(false);
@@ -108,46 +115,40 @@ const Dashboard = () => {
           <div className="mx-8">
             <ul className="menu menu-lg bg-base-200 rounded-box">
               <li>
-                <Link
-                  to="edit-profile"
-                  className="flex items-center gap-3"
-                >
+                <Link to="edit-profile" className="flex items-center gap-3">
                   <FaPencil />
                   Edit Your Profile
                 </Link>
               </li>
-              <li>
-                <Link to="404" className="flex items-center gap-3">
-                  <FaList />
-                  Do Something
-                </Link>
-              </li>
-              <li>
-                <a>Item 3</a>
-              </li>
             </ul>
           </div>
-          <br/>
+          <br />
         </>
       ) : accountType === "vendors" ? (
         <>
           {user && user.approved === true ? (
             <div className="mx-8">
+              <hr className="mb-4" />
+              <div className="mx-4">
+                <div className="flex items-center gap-3">
+                  <FaBook size={18} />{" "}
+                  <h2 className="font-bold text-xl">Current Reservations</h2>
+                </div>
+                <ReservationList
+                  userUID={authUser.uid}
+                  userType={accountType}
+                />
+              </div>
+              <br />
               <ul className="menu menu-lg bg-base-200 rounded-box">
                 <li>
-                  <Link
-                    to="listing"
-                    className="flex items-center gap-3"
-                  >
+                  <Link to="listing" className="flex items-center gap-3">
                     <FaList />
                     View Current Listing
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="edit-profile"
-                    className="flex items-center gap-3"
-                  >
+                  <Link to="edit-profile" className="flex items-center gap-3">
                     <FaPencil />
                     Edit Your Profile
                   </Link>

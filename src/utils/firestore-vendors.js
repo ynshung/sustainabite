@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import _ from "underscore";
 
@@ -21,3 +21,14 @@ export const getVendors = (vendors, setVendors) => {
   });
   return unsubscribe;
 };
+
+export async function getSpecificVendor(vendorID) {
+  const docRef = doc(db, "vendors", vendorID);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    throw new Error("No such document!");
+  }
+}
