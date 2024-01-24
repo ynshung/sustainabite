@@ -9,6 +9,7 @@ import {
   doc,
   increment,
   orderBy,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import _ from "underscore";
@@ -101,6 +102,25 @@ export const fulfillReservation = async (
 
   return true;
 };
+
+export const cancelReservation = async (
+  reservationID,
+  userID,
+  itemID,
+  itemQty,
+) => {
+  await deleteDoc(doc(db, "reservations", reservationID));
+
+  await updateDoc(doc(db, "users", userID), {
+    currentReservation: increment(-1),
+  });
+
+  await updateDoc(doc(db, "listing", itemID), {
+    qty: increment(parseInt(itemQty)),
+  });
+
+  return true;
+}
 
 export const reportReservation = async (
   reservationID,

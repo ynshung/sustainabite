@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import {
+  cancelReservation,
   fulfillReservation,
   getReservations,
   reportReservation,
@@ -184,7 +185,9 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
                   onClick={() => preReportReservation(id)}
                   className="flex flex-row items-center gap-2 text-theme1-500 cursor-pointer"
                 >
-                  <FaTriangleExclamation /> Report<br/>Issue
+                  <FaTriangleExclamation /> Report
+                  <br />
+                  Issue
                 </div>
               ) : (
                 <>
@@ -258,7 +261,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
               </span>
             </div>
             {userType === "users" && !reservation.userFulfilled && (
-              <div className="mt-3 col-span-2 mx-auto">
+              <div className="flex gap-2 mt-3 col-span-2 mx-auto">
                 <button
                   onClick={() =>
                     preConfirmPickup(
@@ -272,6 +275,27 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
                   className="btn btn-primary text-white btn-sm"
                 >
                   Confirm Pickup
+                </button>
+                <button
+                  onClick={() =>
+                    Swal.fire({
+                      title: "Cancel Reservation?",
+                      text: "This action cannot be undone!",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonText: "Cancel Reservation",
+                      cancelButtonText: "Cancel",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        cancelReservation(id, reservation.user, reservation.listing, reservation.qty).then(() =>
+                          toast.success("Reservation cancelled!"),
+                        );
+                      }
+                    })
+                  }
+                  className="btn btn-warning text-white btn-sm"
+                >
+                  Cancel
                 </button>
               </div>
             )}
