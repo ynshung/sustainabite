@@ -20,6 +20,7 @@ import { getVendors } from "../../utils/firestore-vendors";
 import { useUserContext } from "../../context/UseUserContext";
 import ReservationList from "../../components/list/ReservationList";
 import { normalizePhoneNumber } from "../../utils/normalize-phone-no";
+import Swal from "sweetalert2";
 
 const Dashboard = () => {
   let [loading, setLoading] = useState(true);
@@ -151,15 +152,30 @@ const Dashboard = () => {
                   </p>
                   <p>Total listing: {vendors[selectedVendorID].activeItems}</p>
                 </div>
-                <a
-                  href={`http://maps.google.com/maps?q=${vendors[selectedVendorID].latitude},${vendors[selectedVendorID].longitude}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm flex flex-row items-center gap-2 hover:underline"
-                >
-                  View on Google Maps
-                  <FaArrowUpRightFromSquare size={12} />
-                </a>
+                <div className="text-right">
+                  <div
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Full Address",
+                        text: vendors[selectedVendorID].address,
+                        icon: "info",
+                        confirmButtonText: "Close",
+                      });
+                    }}
+                    className="hover:underline cursor-pointer text-sm"
+                  >
+                    View Full Address
+                  </div>
+                  <a
+                    href={`http://maps.google.com/maps?q=${vendors[selectedVendorID].latitude},${vendors[selectedVendorID].longitude}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm flex flex-row items-center gap-2 hover:underline"
+                  >
+                    View on Google Maps
+                    <FaArrowUpRightFromSquare size={12} />
+                  </a>
+                </div>
               </div>
               <VendorItemsList
                 vendor={selectedVendorID}

@@ -18,7 +18,8 @@ function Login() {
         const user = userCredential.user;
         console.log(user);
         toast.success("Logged in successfully!");
-        window.location.href = "/dashboard";
+        if (user.email === "admin@ynshung.com") window.location.href = "/admin";
+        else window.location.href = "/dashboard";
       })
       .catch((error) => {
         const errorCode = error.code;

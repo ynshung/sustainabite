@@ -91,6 +91,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
     });
 
     if (!reason) return;
+    const reasonValue = reasons[reason];
 
     const { value: comments } = await Swal.fire({
       title: "Report Reservation",
@@ -112,7 +113,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
         reservationID,
         userUID,
         userType,
-        reason,
+        reasonValue,
         comments,
       );
       toast.success("Reservation reported!");

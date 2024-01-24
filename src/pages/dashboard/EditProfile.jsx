@@ -36,7 +36,7 @@ const EditProfile = () => {
 
       uploadProfileFiles(obj, authUser.uid)
         .then((res) => {
-          uploadFirestore(res, authUser.uid, accountType)
+          uploadFirestore(res, authUser.uid, accountType, true)
             .then(() => {
               toast.success("Profile updated!");
               setLoading(false);

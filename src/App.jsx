@@ -21,6 +21,10 @@ import NewListing from "./pages/dashboard/NewListing";
 import EditListing from "./pages/dashboard/EditListing";
 import ReservationHistory from "./pages/dashboard/ReservationHistory";
 import CenterElementMD from "./components/CenterElementMD";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserReports from "./pages/admin/UserReports";
+import VerifyOrgs from "./pages/admin/VerifyOrgs";
+import { AdminProvider } from "./context/AdminContext";
 
 export function App() {
   return (
@@ -58,7 +62,11 @@ export function App() {
                 </Route>
               </Route>
 
-              <Route path="/admin/dashboard" />
+              <Route path="/admin" element={<AdminProvider />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="verify/:id" element={<VerifyOrgs />} />
+                <Route path="reports/:id" element={<UserReports />} />
+              </Route>
             </Routes>
           </div>
         </UserProvider>
