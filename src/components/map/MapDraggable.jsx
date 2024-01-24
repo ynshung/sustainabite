@@ -12,7 +12,7 @@ function MapDraggable({ position = null, setPosition, locate = true }) {
       <MapContainer
         center={[5.354669283327304, 100.3015388795525]}
         zoom={16}
-        className="h-64 mx-auto"
+        className="h-[50vh] mx-auto"
       >
         <CurrentLocation
           position={position}

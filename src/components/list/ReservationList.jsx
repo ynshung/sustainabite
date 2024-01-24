@@ -80,7 +80,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
       inputOptions: reasons,
       inputPlaceholder: "Select a reason",
       showCancelButton: true,
-      confirmButtonText: "Report",
+      confirmButtonText: "Next",
       cancelButtonText: "Cancel",
       inputValidator: (value) => {
         if (!value) {
@@ -174,16 +174,17 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
       (user || vendor) && (
         <div>
           <div className="flex justify-between items-center px-4">
-            <div className="">
-              Reservation ID:<code className="mx-2">{id.substring(0, 6)}</code>
+            <div className="flex-1">
+              Reservation ID:
+              <code className="mx-2">{id.substring(0, 6).toLowerCase()}</code>
             </div>
-            <div className="text-xs">
+            <div className="flex-none text-xs">
               {!reservation.reported ? (
                 <div
                   onClick={() => preReportReservation(id)}
                   className="flex flex-row items-center gap-2 text-theme1-500 cursor-pointer"
                 >
-                  <FaTriangleExclamation /> Report Issue
+                  <FaTriangleExclamation /> Report<br/>Issue
                 </div>
               ) : (
                 <>
@@ -247,7 +248,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
                 </a>
               )}
             </div>
-            <div className="flex flex-row items-center gap-2">
+            <div className="flex flex-row items-center gap-2 col-span-2 xs:col-span-1">
               <FaClock />
               <span
                 className="tooltip tooltip-bottom tooltip-secondary"
@@ -291,7 +292,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
         Object.keys(reservations).map((key) => {
           const reservation = reservations[key];
           return (
-            <div className="my-4 bg-theme1-50 rounded px-2 py-4" key={key}>
+            <div className="my-4 bg-theme1-50 rounded px-2 py-4 shadow" key={key}>
               <ReservationDetails reservation={reservation} id={key} />
             </div>
           );

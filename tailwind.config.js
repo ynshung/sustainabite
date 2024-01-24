@@ -8,6 +8,9 @@ export default {
         sans: ["Raleway", "Inter", "Helvetica", "Arial", "sans-serif"],
         title: ["Titan One", "Raleway", "sans-serif"],
       },
+      screens: {
+        xs: "456px",
+      },
       colors: {
         // 200
         theme1: {

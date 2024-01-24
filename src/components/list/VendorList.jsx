@@ -36,7 +36,7 @@ const VendorList = ({ vendors, viewListing, doGetCurrLoc = true }) => {
     .map(({ vendorID, avatar, orgName, activeItems, distance }) => {
       return (
         <div
-          className="card card-compact card-side bg-base-100 shadow-xl mb-6"
+          className="card card-compact card-side bg-base-100 shadow-md mb-6"
           key={vendorID}
         >
           <div className="card-body">

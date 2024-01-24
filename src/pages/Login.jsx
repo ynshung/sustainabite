@@ -50,7 +50,7 @@ function Login() {
 
   return (
     <>
-      <form className="flex flex-col gap-5 px-7 py-8 pb-4" onSubmit={signIn}>
+      <form className="flex flex-col justify-center gap-5 px-7 py-8 pb-4" onSubmit={signIn}>
         <h1 className="text-3xl font-bold">Login</h1>
         <div className="join join-vertical">
           <input

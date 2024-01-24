@@ -20,6 +20,7 @@ import VendorListing from "./pages/dashboard/VendorListing";
 import NewListing from "./pages/dashboard/NewListing";
 import EditListing from "./pages/dashboard/EditListing";
 import ReservationHistory from "./pages/dashboard/ReservationHistory";
+import CenterElementMD from "./components/CenterElementMD";
 
 export function App() {
   return (
@@ -32,12 +33,14 @@ export function App() {
             <Routes>
               <Route path="/" element={<Home />} />
 
-              <Route element={<CenterElement />}>
+              <Route element={<CenterElementMD />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/sign-up" element={<SignUp />} />
-                <Route path="/get-started" element={<GetStarted />} />
                 <Route path="*" element={<NotFound />} />
+              </Route>
+              <Route element={<CenterElement />}>
+                <Route path="/get-started" element={<GetStarted />} />
               </Route>
 
               <Route path="/dashboard">

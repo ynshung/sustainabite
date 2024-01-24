@@ -51,7 +51,7 @@ export function UserProvider({ children }) {
               // setError(error.message);
             });
         } else {
-          setError("Not logged in!");
+          // setError("Not logged in!");
         }
       });
     }

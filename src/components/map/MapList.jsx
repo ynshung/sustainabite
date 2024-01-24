@@ -65,7 +65,7 @@ const MapList = ({ viewListing, selectedVendorID, vendors }) => {
       <MapContainer
         center={[5.356205, 100.296206]}
         zoom={16}
-        className="h-96 w-full mx-auto"
+        className="h-[50vh] w-full mx-auto"
       >
         <CurrentLocation
           showPosition={true}

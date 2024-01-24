@@ -1,10 +1,11 @@
-import { TbBell, TbMenuDeep } from "react-icons/tb";
+import { TbMenuDeep } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 import sustainabite from "../assets/sustainabite-lb-bg.png";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { useUserContext } from "../context/UseUserContext";
+import { FaHouse } from "react-icons/fa6";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -13,16 +14,33 @@ const NavBar = () => {
   return (
     <div className="navbar shadow-md bg-theme1-50">
       <div className="navbar-start">
-        <div className="dropdown">
+        <Link to="/" className="btn btn-square btn-ghost btn-circle">
+          <FaHouse size={18} />
+        </Link>
+      </div>
+      <div className="navbar-center">
+        <Link
+          to={loaded && authUser ? "/dashboard" : "/"}
+          className="btn btn-ghost text-xl"
+        >
+          <img src={sustainabite} width={32} height={32}></img>SustainaBite
+        </Link>
+      </div>
+      <div className="navbar-end">
+        <div className="dropdown dropdown-end">
           <div tabIndex="0" role="button" className="btn btn-ghost btn-circle">
             <TbMenuDeep size={20} />
           </div>
           <ul
             tabIndex="0"
-            className="menu dropdown-content mt-3 bg-theme1-100 z-[10000] p-2 shadow-lg rounded-box w-52 "
+            className="menu dropdown-content mt-3 bg-theme1-100 z-[10000] p-2 shadow-md rounded-box w-52 "
           >
             {loaded && authUser ? (
               <>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+
                 <li>
                   <Link to="/dashboard">Dashboard</Link>
                 </li>
@@ -58,20 +76,13 @@ const NavBar = () => {
             )}
           </ul>
         </div>
-      </div>
-      <div className="navbar-center">
-        <Link to={loaded && authUser ? "/dashboard" : "/"} className="btn btn-ghost text-xl">
-          <img src={sustainabite} width={32} height={32}></img>SustainaBite
-        </Link>
-      </div>
-      <div className="navbar-end">
-        <button className="btn btn-ghost btn-circle">
+        {/* <button className="btn btn-ghost btn-circle">
           <div className="indicator">
             <TbBell size={24} />
             <span className="badge badge-xs badge-primary indicator-item "></span>
             <span className="badge badge-xs badge-primary indicator-item animate-ping origin-bottom-left"></span>
           </div>
-        </button>
+        </button> */}
       </div>
     </div>
   );

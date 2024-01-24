@@ -1,4 +1,15 @@
-import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, increment, orderBy } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+  increment,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import _ from "underscore";
 
@@ -38,19 +49,15 @@ export const getReservations = (
         delete newReservationListing[change.doc.id];
       }
     });
-    if (!_.isEqual(newReservationListing, reservationListing))
+    if (!_.isEqual(newReservationListing, reservationListing)) {
       setReservationListing(newReservationListing);
+    }
   });
   return unsubscribe;
 };
 
-export const createReservation = async (
-  userID,
-  itemID,
-  itemQty,
-  vendorID,
-) => {
-  const docRef = await addDoc(collection(db, "reservations"),{
+export const createReservation = async (userID, itemID, itemQty, vendorID) => {
+  const docRef = await addDoc(collection(db, "reservations"), {
     createdAt: serverTimestamp(),
     listing: itemID,
     qty: parseInt(itemQty),
@@ -66,7 +73,6 @@ export const createReservation = async (
   await updateDoc(doc(db, "listing", itemID), {
     qty: increment(-parseInt(itemQty)),
   });
-
 
   return docRef.id;
 };
@@ -113,4 +119,3 @@ export const reportReservation = async (
 
   return true;
 };
-  
