@@ -19,7 +19,7 @@ const VendorItem = ({
     onChildData(d);
   };
 
-  watch("img");
+  watch(["img", "price"]);
 
   return (
     <>

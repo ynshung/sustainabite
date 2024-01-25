@@ -3,18 +3,21 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
   increment,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import _ from "underscore";
+import _, { where } from "underscore";
 
 async function newListing(vendorID, obj, updateUID = null) {
   let newObj = _.clone(obj);
 
   newObj.price = parseFloat(newObj.price);
+  newObj.oriPrice = parseFloat(newObj.oriPrice);
   newObj.qty = parseInt(newObj.qty);
   newObj.vendor = vendorID;
 
@@ -59,6 +62,14 @@ async function newListing(vendorID, obj, updateUID = null) {
 
 const deleteListing = async (id) => {
   const docRef = doc(db, "listing", id);
+
+  const q = query(collection(db, "reservations"), where("listing", "==", id));
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach(async (doc) => {
+    await deleteDoc(doc.ref);
+  });
+
   return await deleteDoc(docRef);
 }
 
