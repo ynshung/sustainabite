@@ -6,6 +6,7 @@ async function uploadFirestore(obj, uid, accountType, isUpdate = false) {
   if (accountType === "vendors") {
     obj.latitude = parseFloat(obj.latitude);
     obj.longitude = parseFloat(obj.longitude);
+    obj.approved = false;
   }
 
   obj.createdAt = serverTimestamp();
