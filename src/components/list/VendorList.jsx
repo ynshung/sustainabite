@@ -68,6 +68,7 @@ const VendorList = ({ vendors, viewListing, doGetCurrLoc = true }) => {
             distanceFormatted,
           };
         })
+        .sort((a, b) => b.activeItems - a.activeItems)
         .sort((a, b) => a.distance - b.distance)
         .map(
           ({ vendorID, avatar, orgName, activeItems, distanceFormatted }) => {
