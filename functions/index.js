@@ -2,6 +2,7 @@
 
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
+const { info, error } = require("firebase-functions/logger");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 
@@ -39,14 +40,14 @@ exports.updateVendorActiveItems = onDocumentUpdated(
             vendorRef.update({
                 activeItems: activeItemsCount,
             }).then (() => {
-                console.log(
+                info(
                     `Updated activeItems for vendor ${vendorId} to ${activeItemsCount}`,
                 );
-            }).catch((error) => {
-                console.error("Error updating vendor activeItems:", error);
+            }).catch((err) => {
+                error("Error updating vendor activeItems:", err);
             });
-        }).catch((error) => {
-            console.error("Error updating vendor activeItems:", error);
+        }).catch((err) => {
+            error("Error updating vendor activeItems:", err);
         });
     }
 

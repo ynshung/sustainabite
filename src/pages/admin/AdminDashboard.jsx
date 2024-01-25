@@ -80,7 +80,6 @@ const AdminDashboard = () => {
                   reason,
                   reasonByType,
                   user,
-                  userFulfilled,
                   vendor,
                 } = reports[id];
                 return (

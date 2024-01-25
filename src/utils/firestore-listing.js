@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  increment,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -48,6 +49,10 @@ async function newListing(vendorID, obj, updateUID = null) {
   }
 
   isUpdateDoc ? await updateDoc(docRef, newObj) : await setDoc(docRef, newObj);
+
+  updateDoc(doc(db, "vendor", vendorID), {
+    activeItems: increment(isUpdateDoc || !newObj.active || !newObj.active ? 0 : 1),
+  });
 
   return docRef.id;
 }
