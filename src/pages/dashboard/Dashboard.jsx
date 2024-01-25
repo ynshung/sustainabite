@@ -194,7 +194,6 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="mx-8 my-6">
-              <h2 className="text-xl font-bold mb-2">Vendors Near You</h2>
               <VendorList
                 vendors={vendors}
                 viewListing={(id) => {
