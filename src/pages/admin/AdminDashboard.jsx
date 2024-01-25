@@ -36,7 +36,7 @@ const AdminDashboard = () => {
                 const { email, orgName, firstName, phoneNumber, avatar } =
                   verification[id];
                 return (
-                  <div key={id} className="card bg-base-100 shadow-md mb-8">
+                  <div key={id} className="card bg-base-100 shadow-md mb-4">
                     <div className="card-body pb-4">
                       <div className="flex flex-row items-center gap-4">
                         <div className="avatar w-16">
@@ -68,6 +68,7 @@ const AdminDashboard = () => {
                 );
               })
             )}
+            <br/>
             <h2 className="text-xl font-bold">Users/Vendors Reports</h2>
             {Object.keys(reports).length === 0 ? (
               <p>No new reports</p>
