@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
 import PropTypes from "prop-types";
+import { blueIcon } from "./map/MarkerIcons";
 
 const LocationMarker = ({ position, setPosition }) => {
   const markerRef = useRef(null);
@@ -22,6 +23,7 @@ const LocationMarker = ({ position, setPosition }) => {
       eventHandlers={eventHandlers}
       ref={markerRef}
       draggable
+      icon={blueIcon}
     >
       <Popup>Your vendor&apos;s location</Popup>
     </Marker>
