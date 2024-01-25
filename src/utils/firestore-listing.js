@@ -1,6 +1,7 @@
 import { db, storage } from "../firebase";
 import {
   collection,
+  deleteDoc,
   doc,
   serverTimestamp,
   setDoc,
@@ -27,6 +28,8 @@ async function newListing(vendorID, obj, updateUID = null) {
     ? doc(db, "listing", updateUID)
     : doc(collection(db, "listing"));
 
+  updateUID = updateUID ? updateUID : docRef.id;
+
   if (newObj.img && newObj.img[0].size > 1000) {
     newObj.img = newObj.img[0];
 
@@ -35,7 +38,10 @@ async function newListing(vendorID, obj, updateUID = null) {
       throw new Error("Image size too large! Max 5MB.");
     }
 
-    const storageRef = ref(storage, `items/${updateUID}/${newObj.img.name}`);
+    const storageRef = ref(
+      storage,
+      `items/${updateUID}/${Date.now()}-${newObj.img.name}`,
+    );
     const snapshot = await uploadBytes(storageRef, newObj.img);
 
     newObj.img = await getDownloadURL(snapshot.ref);
@@ -46,4 +52,9 @@ async function newListing(vendorID, obj, updateUID = null) {
   return docRef.id;
 }
 
-export { newListing };
+const deleteListing = async (id) => {
+  const docRef = doc(db, "listing", id);
+  return await deleteDoc(docRef);
+}
+
+export { newListing, deleteListing };

@@ -2,12 +2,13 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import VendorItem from "../../components/VendorItem";
 import { FaChevronLeft } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { newListing } from "../../utils/firestore-listing";
+import { newListing, deleteListing } from "../../utils/firestore-listing";
 import { toast } from "react-toastify";
 import ScrollToTop from "../../utils/ScrollToTop";
 import { useUserContext } from "../../context/UseUserContext";
 import PropTypes from "prop-types";
 import { getSpecificListing } from "../../utils/firestore-vendor-listing";
+import Swal from "sweetalert2";
 
 const EditListing = () => {
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,34 @@ const EditListing = () => {
       });
   };
 
+  const deleteItem = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will not be able to recover this listing!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        deleteListing(id)
+          .then(() => {
+            toast.success("Listing deleted successfully!");
+            navigate("/dashboard/listing");
+          })
+          .catch((error) => {
+            console.log(error);
+            toast.error(`Error deleting listing: ${error}`);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+    });
+  }
+
   return (
     <>
       <div className="m-8">
@@ -63,7 +92,7 @@ const EditListing = () => {
           >
             <FaChevronLeft className="inline" size={18} /> Go back to Listing
           </Link>
-          <h1 className="font-bold text-xl">New Item</h1>
+          <h1 className="font-bold text-xl">Edit Item</h1>
         </div>
         {listing ? (
           <VendorItem
@@ -72,6 +101,7 @@ const EditListing = () => {
             onChildData={(f) => editListing(f)}
             editItem={true}
             defaultObj={listing}
+            deleteItem={() => deleteItem()}
           />
         ) : (
           <div className="flex">

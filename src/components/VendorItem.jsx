@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form";
 import _ from "underscore";
 
 const VendorItem = ({
-  defaultObj = {active: true},
+  defaultObj = { active: true },
   loading = false,
   setLoading,
   onChildData,
   editItem = false,
+  deleteItem = null,
 }) => {
   const { register, handleSubmit, getValues, watch } = useForm({
     defaultValues: defaultObj,
@@ -99,7 +100,12 @@ const VendorItem = ({
           </div>
           <div>
             <label className="label">
-              <span className="label-text">Original Price</span>
+              <span
+                className="label-text cursor-help border-b-2 border-gray-400 border-dotted tooltip"
+                data-tip="This is to enable calculation of customer's savings and encourage further use of SustainaBite."
+              >
+                Original Price
+              </span>
             </label>
             <div className="join">
               <div className="btn btn-disabled join-item">
@@ -143,12 +149,23 @@ const VendorItem = ({
           />
         </div>
         {!loading ? (
-          <button
-            type="submit"
-            className="btn btn-primary text-neutral-50 mx-auto text-lg px-8"
-          >
-            Submit
-          </button>
+          <div className="flex flex-col items-center mx-auto gap-2">
+            <button
+              type="submit"
+              className="btn btn-primary text-neutral-50 text-lg px-8"
+            >
+              Submit
+            </button>
+            {editItem && (
+              <button
+                type="button"
+                onClick={() => deleteItem()}
+                className="btn btn-error btn-sm text-neutral-50 px-4"
+              >
+                Remove Listing
+              </button>
+            )}
+          </div>
         ) : (
           <progress className="progress w-56 mx-auto progress-primary" />
         )}
@@ -163,6 +180,7 @@ VendorItem.propTypes = {
   setLoading: PropTypes.func,
   onChildData: PropTypes.func,
   editItem: PropTypes.bool,
+  deleteItem: PropTypes.func,
 };
 
 export default VendorItem;

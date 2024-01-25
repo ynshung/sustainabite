@@ -52,6 +52,7 @@ export function UserProvider({ children }) {
             });
         } else {
           // setError("Not logged in!");
+          setLoaded(true);
         }
       });
     }

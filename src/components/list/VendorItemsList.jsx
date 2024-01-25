@@ -131,7 +131,7 @@ const VendorItemsList = ({ vendor, selectItem, userType, userUID }) => {
             </div>
           </figure>
           <div className="card-body !pe-2">
-            <div className="flex flex-row gap-4 items-center">
+            <div className="flex flex-row justify-between gap-4 items-center">
               <div>
                 <h2 className="card-title">{name}</h2>
                 <p>{desc}</p>

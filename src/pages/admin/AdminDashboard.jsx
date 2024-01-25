@@ -1,12 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAdminContext } from "../../context/UseAdminContext";
 import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import Swal from "sweetalert2";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 const AdminDashboard = () => {
-  const { verification, reports, loaded } = useAdminContext();
+  const { verification, reports, loaded, error } = useAdminContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      if (error === "Not authorized.") navigate("/login");
+    }
+  })
 
   return (
     <>

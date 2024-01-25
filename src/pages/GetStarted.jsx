@@ -26,6 +26,7 @@ const GetStarted = () => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       if (u) {
         setUser(u);
+        if (u.email === "admin@ynshung.com") navigate("/admin");
       } else {
         navigate("/login");
       }

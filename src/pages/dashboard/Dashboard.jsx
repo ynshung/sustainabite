@@ -43,6 +43,10 @@ const Dashboard = () => {
       }
       setLoading(false);
     } else if (error) {
+      if (authUser.email === "admin@ynshung.com") {
+        navigate("/admin");
+        return;
+      }
       toast.error(error);
       if (
         error === "Account type not found! Redirecting to Get Started page..."
@@ -215,7 +219,7 @@ const Dashboard = () => {
                 </div>
                 <div className="stat-title">Money Saved</div>
                 <div className="stat-value text-3xl">
-                  RM{user.totalSaved.toFixed(2) ?? 0}
+                  RM{user.totalSaved ? user.totalSaved.toFixed(2) : "0.00"}
                 </div>
               </div>
             </div>

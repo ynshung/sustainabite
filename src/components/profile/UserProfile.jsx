@@ -57,7 +57,7 @@ function UserProfile({
           </label>
           <input
             type="tel"
-            placeholder="012-345 6789"
+            placeholder="012-3456789"
             className="input input-bordered w-full"
             required
             {...register("phoneNumber")}

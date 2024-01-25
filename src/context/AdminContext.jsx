@@ -78,7 +78,7 @@ export function AdminProvider() {
           setLoaded(true);
           console.log("Admin loaded!");
         } else {
-          // setError("Not authorized.");
+          setError("Not authorized.");
         }
       });
     }
