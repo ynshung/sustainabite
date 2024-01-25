@@ -27,7 +27,7 @@ const MapList = ({ viewListing, selectedVendorID, vendors }) => {
               : greyIcon
         }
       >
-        <Popup ref={popupElement}>
+        <Popup minWidth={128} ref={popupElement}>
           <div>
             <div className="flex flex-row gap-4 items-center mb-2">
               <img src={vendorData.avatar} className="w-16" width={64} />

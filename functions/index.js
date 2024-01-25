@@ -9,53 +9,58 @@ const { onDocumentWritten } = require("firebase-functions/v2/firestore");
 initializeApp();
 const db = getFirestore();
 
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({ maxInstances: 10, region: "asia-southeast1" });
 
 exports.updateVendorActiveItems = onDocumentWritten(
   "/listing/{listingId}",
   (event) => {
     const newValue = event.data.after.data();
-    const previousValue = event.data.before.data();
+    // const previousValue = event.data.before.data();
 
     // Check if qty or active field has changed
-    if (
-      (newValue.qty !== previousValue.qty &&
-        (newValue.qty === 0 || previousValue.qty === 0)) ||
-      newValue.active !== previousValue.active
-    ) {
-      const vendorId = newValue.vendor;
+    // if (
+    //   newValue.qty &&
+    //   previousValue.qty &&
+    //   ((newValue.qty !== previousValue.qty &&
+    //     (newValue.qty === 0 || previousValue.qty === 0)) ||
+    //     newValue.active !== previousValue.active)
+    // ) {
+    const vendorId = newValue.vendor;
+    info("vendorId:", vendorId);
 
-      // Get the count of active items with qty greater than zero for the vendor
-      const activeItemsQuery = db
-        .collection("/listing")
-        .where("vendor", "==", vendorId)
-        .where("active", "==", true)
-        .where("qty", ">", 0);
+    // Get the count of active items with qty greater than zero for the vendor
+    const activeItemsQuery = db
+      .collection("/listing")
+      .where("vendor", "==", vendorId)
+      .where("active", "==", true)
+      .where("qty", ">", 0);
 
-      activeItemsQuery
-        .get()
-        .then((snapshot) => {
-          const activeItemsCount = snapshot.size;
+    activeItemsQuery
+      .get()
+      .then((snapshot) => {
+        const activeItemsCount = snapshot.size;
 
-          // Update the corresponding vendor document
-          const vendorRef = db.doc(`/vendors/${vendorId}`);
-          vendorRef
-            .update({
-              activeItems: activeItemsCount,
-            })
-            .then(() => {
-              info(
-                `Updated activeItems for vendor ${vendorId} to ${activeItemsCount}`,
-              );
-            })
-            .catch((err) => {
-              error("Error updating vendor activeItems:", err);
-            });
-        })
-        .catch((err) => {
-          error("Error updating vendor activeItems:", err);
-        });
-    }
+        info("activeItemsCount:", activeItemsCount)
+
+        // Update the corresponding vendor document
+        const vendorRef = db.doc(`/vendors/${vendorId}`);
+        vendorRef
+          .update({
+            activeItems: activeItemsCount,
+          })
+          .then(() => {
+            info(
+              `Updated activeItems for vendor ${vendorId} to ${activeItemsCount}`,
+            );
+          })
+          .catch((err) => {
+            error("Error updating vendor activeItems:", err);
+          });
+      })
+      .catch((err) => {
+        error("Error updating vendor activeItems:", err);
+      });
+    // }
 
     return null;
   },
