@@ -282,7 +282,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-title">Money Earned</div>
                     <div className="stat-value text-3xl">
-                      RM{user.totalEarned.toFixed(2) ?? 0}
+                      RM{user.totalEarned ? user.totalEarned.toFixed(2) : 0}
                     </div>
                   </div>
                 </div>
