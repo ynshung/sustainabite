@@ -35,11 +35,19 @@ const NavBar = () => {
             tabIndex="0"
             className="menu dropdown-content mt-3 bg-theme1-100 z-[10000] p-2 shadow-md rounded-box w-52 "
           >
-            {loaded && authUser ? (
+            {authUser ? (
               <>
-                <li>
-                  <Link to="/dashboard">Dashboard</Link>
-                </li>
+                {authUser.email === "admin@ynshung.com" ? (
+                  <>
+                    <li>
+                      <Link to="/admin">Admin Dashboard</Link>
+                    </li>
+                  </>
+                ) : (
+                  <li>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </li>
+                )}
 
                 <li>
                   <a

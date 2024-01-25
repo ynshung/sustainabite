@@ -83,7 +83,7 @@ const AdminDashboard = () => {
                   vendor,
                 } = reports[id];
                 return (
-                  <div key={id} className="card bg-base-100 shadow-lg">
+                  <div key={id} className="card bg-base-100 shadow-lg mb-4">
                     <div className="card-body">
                       <div className="">
                         <div>
