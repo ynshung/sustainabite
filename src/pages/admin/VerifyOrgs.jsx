@@ -34,8 +34,11 @@ const VerifyOrgs = () => {
         .then((res) => {
           uploadFirestore(res, id, "vendors", true)
             .then(() => {
-              toast.success("Verification complete!");
-              setLoading(false);
+              setTimeout(() => {
+                toast.success("Verification complete!");
+                setLoading(false);
+                navigate("/admin");
+              }, 1000);
             })
             .catch((err) => {
               toast.error(err.message);
@@ -73,7 +76,7 @@ const VerifyOrgs = () => {
       },
       allowOutsideClick: () => !Swal.isLoading(),
     });
-  }
+  };
 
   return (
     <>
@@ -117,7 +120,11 @@ const VerifyOrgs = () => {
                   <FaFileArrowDown />
                   View Proof of Ownership
                 </a>
-                <button type="button" onClick={() => rejectOrg()} className="btn btn-warning">
+                <button
+                  type="button"
+                  onClick={() => rejectOrg()}
+                  className="btn btn-warning"
+                >
                   <FaCircleXmark />
                   Reject Application
                 </button>

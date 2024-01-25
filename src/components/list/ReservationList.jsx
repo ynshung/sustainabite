@@ -328,7 +328,7 @@ const ReservationList = ({ userUID, userType, showFulfilled = false }) => {
 
   return (
     <>
-      {reservations && _.isEmpty(reservations) !== 0 ? (
+      {reservations && !_.isEmpty(reservations) ? (
         Object.keys(reservations).map((key) => {
           const reservation = reservations[key];
           return (

@@ -358,6 +358,7 @@ const Dashboard = () => {
                       if (result.isConfirmed) {
                         resubmitVerification(authUser.uid).then(() => {
                           toast.success("Submitted!");
+                          window.location.reload();
                         });
                       }
                     });
