@@ -48,7 +48,6 @@ const VendorList = ({ vendors, viewListing, doGetCurrLoc = true }) => {
         avatar,
         orgName,
         activeItems,
-        distance,
         distanceFormatted,
       }) => {
         return (
