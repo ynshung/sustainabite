@@ -28,7 +28,7 @@ export function AdminProvider() {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const newVerification = _.clone(verification ?? {});
         querySnapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
+          if (change.type === "added" && !change.doc.data().rejectionReason) {
             newVerification[change.doc.id] = change.doc.data();
           }
           if (change.type === "modified") {

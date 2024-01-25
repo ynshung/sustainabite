@@ -33,9 +33,9 @@ function Home() {
                     ? "/dashboard"
                     : "/admin"
                 }
-                className="btn btn-primary text-white btn-lg text-2xl w-min rounded-xl shadow-lg"
+                className="btn btn-primary text-white btn-lg text-2xl w-min rounded-xl shadow-lg text-nowrap"
               >
-                Dashboard
+                {authUser.email === "admin@ynshung.com" && "Admin "}Dashboard
               </Link>
             ) : (
               <Link
@@ -53,7 +53,9 @@ function Home() {
       <br />
       <br />
       <div>
-        <p className="text-center my-3">&#169; 2024 Universiti Sains Malaysia</p>
+        <p className="text-center my-3">
+          &#169; 2024 Universiti Sains Malaysia
+        </p>
       </div>
     </div>
   );

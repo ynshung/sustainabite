@@ -8,15 +8,20 @@ import {
   FaChevronLeft,
   FaCircleInfo,
   FaClockRotateLeft,
+  FaEnvelope,
   FaHandHoldingDollar,
   FaList,
+  FaPaperPlane,
   FaPencil,
   FaPlus,
 } from "react-icons/fa6";
 import MapList from "../../components/map/MapList";
 import VendorItemsList from "../../components/list/VendorItemsList";
 import VendorList from "../../components/list/VendorList";
-import { getVendors } from "../../utils/firestore-vendors";
+import {
+  getVendors,
+  resubmitVerification,
+} from "../../utils/firestore-vendors";
 import { useUserContext } from "../../context/UseUserContext";
 import ReservationList from "../../components/list/ReservationList";
 import { normalizePhoneNumber } from "../../utils/normalize-phone-no";
@@ -310,6 +315,59 @@ const Dashboard = () => {
                 </li>
               </ul>
               <br />
+            </div>
+          ) : user.rejectionReason ? (
+            <div className="mx-8">
+              <div role="alert" className="alert alert-error">
+                <FaCircleInfo size={24} />
+                <p>
+                  Your account is rejected. Please resubmit your profile below:
+                  <br />
+                  Reason: {user.rejectionReason}
+                </p>
+              </div>
+              <div className="my-3">
+                <Link to="edit-profile" className="btn flex gap-3">
+                  <FaPencil />
+                  Edit Your Profile
+                </Link>
+              </div>
+              <div className="my-3">
+                <a
+                  href="mailto:ynshung@student.usm.my"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn flex gap-3"
+                >
+                  <FaEnvelope />
+                  Contact us / Resubmit Documents
+                </a>
+              </div>
+              <div className="my-3">
+                <a
+                  onClick={() => {
+                    Swal.fire({
+                      title: "Are you sure?",
+                      text: "You will be resubmitting your profile for verification.",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonText: "Yes, resubmit!",
+                      cancelButtonText: "No, cancel!",
+                      reverseButtons: true,
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        resubmitVerification(authUser.uid).then(() => {
+                          toast.success("Submitted!");
+                        });
+                      }
+                    });
+                  }}
+                  className="btn btn-success btn-outline flex gap-3"
+                >
+                  <FaPaperPlane />
+                  Resubmit for Verification
+                </a>
+              </div>
             </div>
           ) : (
             <div className="mx-8">

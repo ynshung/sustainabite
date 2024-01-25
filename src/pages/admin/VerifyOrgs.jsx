@@ -3,13 +3,15 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import OrgProfile from "../../components/profile/OrgProfile";
 import { toast } from "react-toastify";
 import _ from "underscore";
-import { FaAngleLeft } from "react-icons/fa6";
+import { FaAngleLeft, FaCircleXmark, FaFileArrowDown } from "react-icons/fa6";
 import {
   uploadFirestore,
   uploadProfileFiles,
 } from "../../utils/firestore-upload";
 import ScrollToTop from "../../utils/ScrollToTop";
 import { useAdminContext } from "../../context/UseAdminContext";
+import Swal from "sweetalert2";
+import { rejectVendor } from "../../utils/firestore-vendors";
 
 const VerifyOrgs = () => {
   const navigate = useNavigate();
@@ -47,6 +49,32 @@ const VerifyOrgs = () => {
     }
   }, [formData, navigate, id, verification]);
 
+  const rejectOrg = () => {
+    // Ask for reason in textarea
+    Swal.fire({
+      title: "Reason for rejection",
+      input: "textarea",
+      inputPlaceholder: "Enter reason here...",
+      inputAttributes: {
+        "aria-label": "Enter reason here",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Reject",
+      showLoaderOnConfirm: true,
+      preConfirm: (reason) => {
+        if (reason) {
+          rejectVendor(id, reason).then(() => {
+            toast.success("Submitted!");
+            navigate("/admin");
+          });
+        } else {
+          Swal.showValidationMessage("Please enter a reason!");
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    });
+  }
+
   return (
     <>
       <ScrollToTop />
@@ -71,16 +99,6 @@ const VerifyOrgs = () => {
 
         {verification && (
           <>
-            <div className="flex justify-center mt-8">
-              <a
-                href={verification[id].proofOfOwnership}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-primary text-white"
-              >
-                View Proof of Ownership
-              </a>
-            </div>
             <OrgProfile
               email={verification[id].email}
               onChildData={setFormData}
@@ -88,7 +106,23 @@ const VerifyOrgs = () => {
               loading={loading}
               setLoading={setLoading}
               editProfile
-            />
+            >
+              <div className="flex flex-col gap-2 items-center justify-center my-4">
+                <a
+                  href={verification[id].proofOfOwnership}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-secondary btn-outline"
+                >
+                  <FaFileArrowDown />
+                  View Proof of Ownership
+                </a>
+                <button type="button" onClick={() => rejectOrg()} className="btn btn-warning">
+                  <FaCircleXmark />
+                  Reject Application
+                </button>
+              </div>
+            </OrgProfile>
           </>
         )}
       </div>

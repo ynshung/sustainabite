@@ -12,6 +12,7 @@ function OrgProfile({
   loading = false,
   setLoading,
   onChildData,
+  children,
 }) {
   const { register, handleSubmit, getValues, setValue, watch } = useForm({
     defaultValues: defaultObj,
@@ -65,10 +66,10 @@ function OrgProfile({
             <span className="label-text">Organisation Image</span>
             <span className="label-text-alt">2MB max</span>
           </label>
-          <label className="form-control w-full join-item max-w-xs">
+          <label className="form-control w-full join-item">
             <input
               type="file"
-              className="file-input file-input-bordered file-input-sm file-input-secondary w-full max-w-xs"
+              className="file-input file-input-bordered file-input-sm file-input-secondary w-full"
               accept="image/*"
               required={editProfile ? false : true}
               {...register("avatar")}
@@ -208,10 +209,10 @@ function OrgProfile({
                 Proof of Ownership ({charity ? "JPPM" : "SSM"} Documents)
               </span>
             </label>
-            <label className="form-control w-full join-item max-w-xs">
+            <label className="form-control w-full join-item">
               <input
                 type="file"
-                className="file-input file-input-bordered file-input-secondary w-full max-w-xs"
+                className="file-input file-input-bordered file-input-secondary w-full"
                 accept="image/*,.pdf"
                 required={editProfile ? false : true}
                 {...register("proofOfOwnership")}
@@ -225,6 +226,8 @@ function OrgProfile({
             </label>
           </div>
         )}
+        
+        {children}
 
         {!loading ? (
           <button
@@ -249,6 +252,7 @@ OrgProfile.propTypes = {
   loading: PropTypes.bool,
   setLoading: PropTypes.func,
   editProfile: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 export default OrgProfile;

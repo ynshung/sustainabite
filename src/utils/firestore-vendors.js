@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, updateDoc, deleteField } from "firebase/firestore";
 import { db } from "../firebase";
 import _ from "underscore";
 
@@ -31,4 +31,22 @@ export async function getSpecificVendor(vendorID) {
   } else {
     throw new Error("No such document!");
   }
+}
+
+export async function rejectVendor(id, reason) {
+  const docRef = doc(db, "vendors", id);
+  
+  await updateDoc(docRef, {
+    approved: false,
+    rejectionReason: reason,
+  });
+}
+
+export async function resubmitVerification(id) {
+  const docRef = doc(db, "vendors", id);
+  
+  await updateDoc(docRef, {
+    approved: false,
+    rejectionReason: deleteField(),
+  });
 }
